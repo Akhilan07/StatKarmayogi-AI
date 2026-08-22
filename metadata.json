@@ -1,0 +1,6 @@
+{
+  "name": "MoSPI StatKarmayogi AI Assessment Engine",
+  "description": "AI Assessment Engine and Competency Platform for the Ministry of Statistics and Programme Implementation (MoSPI), Government of India, integrated with the iGOT Karmayogi competency framework for manual-grounded Bloom's Taxonomy assessment and gap analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
