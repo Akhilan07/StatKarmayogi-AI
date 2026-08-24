@@ -16,6 +16,15 @@ import { AssessmentRunnerModal } from './components/AssessmentRunnerModal';
 import { AssessmentReportModal } from './components/AssessmentReportModal';
 import { CertificateModal } from './components/CertificateModal';
 import { LoginModal } from './components/LoginModal';
+import { LanguageConfirmModal } from './components/LanguageConfirmModal';
+import { LandingLoginPage } from './components/LandingLoginPage';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { ToastProvider } from './context/ToastContext';
+import { OfflineBanner } from './components/OfflineBanner';
+import { DevVariantSwitcher, AppVariant } from './components/DevVariantSwitcher';
+import AppVariantA from '../builds/variant-a-admin-heavy/AppVariantA';
+import AppVariantB from '../builds/variant-b-officer-gamified/AppVariantB';
+import AppVariantC from '../builds/variant-c-live-rag-focus/AppVariantC';
 
 import { 
   TabType, 
@@ -37,11 +46,11 @@ import {
   SAMPLE_GENERATED_MCQS 
 } from './data/mockData';
 
-export default function App() {
+function AppContent() {
+  const { language } = useLanguage();
   // Navigation State
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const [language, setLanguage] = useState<AppLanguage>('en');
   const [karmaPoints, setKarmaPoints] = useState<number>(750);
 
   // User Profile State
@@ -110,10 +119,6 @@ export default function App() {
     competencies.reduce((acc, c) => acc + c.scorePercentage, 0) / competencies.length
   );
 
-  const handleToggleLanguage = () => {
-    setLanguage((prev) => (prev === 'en' ? 'hi' : 'en'));
-  };
-
   // Handler: Start Exam
   const handleStartExam = (
     questions: Question[],
@@ -164,6 +169,19 @@ export default function App() {
     setActiveTab('generator');
   };
 
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
+
+  if (!isLoggedIn) {
+    return (
+      <LandingLoginPage
+        onLoginSuccess={(profile) => {
+          setCurrentUser(profile);
+          setIsLoggedIn(true);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f5f3ee] text-slate-900 flex">
       {/* 1. Sidebar Navigation */}
@@ -175,7 +193,7 @@ export default function App() {
         setIsMobileOpen={setIsMobileNavOpen}
         language={language}
         user={currentUser}
-        onOpenLogin={() => setIsLoginModalOpen(true)}
+        onOpenLogin={() => setIsLoggedIn(false)}
       />
 
       {/* 2. Top Navigation Bar */}
@@ -184,11 +202,9 @@ export default function App() {
         currentScore={totalScore}
         onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
         setActiveTab={setActiveTab}
-        language={language}
-        onChangeLanguage={(lang) => setLanguage(lang)}
         karmaPoints={karmaPoints}
         user={currentUser}
-        onOpenLogin={() => setIsLoginModalOpen(true)}
+        onOpenLogin={() => setIsLoggedIn(false)}
       />
 
       {/* 3. Main Content Container */}
@@ -199,7 +215,7 @@ export default function App() {
             setActiveTab={setActiveTab}
             onStartAssessmentForDomain={handleLaunchTargetedQuiz}
             user={currentUser}
-            onOpenLogin={() => setIsLoginModalOpen(true)}
+            onOpenLogin={() => setIsLoggedIn(false)}
             language={language}
           />
         )}
@@ -292,6 +308,47 @@ export default function App() {
           onClose={() => setIsLoginModalOpen(false)}
         />
       )}
+
+      {/* 8. Multilingual Language Confirmation Modal */}
+      <LanguageConfirmModal />
     </div>
+  );
+}
+
+export default function App() {
+  const [variant, setVariant] = useState<AppVariant>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const vParam = params.get('variant');
+    if (vParam === 'admin' || vParam === 'gamified' || vParam === 'rag' || vParam === 'primary') {
+      return vParam as AppVariant;
+    }
+    const saved = localStorage.getItem('statkarmayogi_variant');
+    if (saved === 'admin' || saved === 'gamified' || saved === 'rag' || saved === 'primary') {
+      return saved as AppVariant;
+    }
+    return 'primary';
+  });
+
+  const handleSelectVariant = (newVariant: AppVariant) => {
+    setVariant(newVariant);
+    localStorage.setItem('statkarmayogi_variant', newVariant);
+  };
+
+  return (
+    <>
+      <OfflineBanner />
+      {variant === 'admin' && <AppVariantA />}
+      {variant === 'gamified' && <AppVariantB />}
+      {variant === 'rag' && <AppVariantC />}
+      {variant === 'primary' && (
+        <LanguageProvider>
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
+        </LanguageProvider>
+      )}
+
+      <DevVariantSwitcher currentVariant={variant} onSelectVariant={handleSelectVariant} />
+    </>
   );
 }

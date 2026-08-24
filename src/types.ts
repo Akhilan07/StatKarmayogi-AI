@@ -68,10 +68,13 @@ export interface OfficialManual {
   sections: { id: string; title: string; content: string }[];
 }
 
+export type CompetencyPillar = 'Statistical' | 'Technical' | 'Digital Governance' | 'Behavioural & Managerial';
+
 export interface CompetencyDomain {
   id: string;
   name: string;
   shortName: string;
+  pillar: CompetencyPillar;
   currentLevel: number; // 1-5
   targetLevel: number; // 1-5
   peerBenchmark: number; // 1-5
@@ -97,6 +100,23 @@ export interface IGOTCourse {
   imageUrl: string;
   progress: number;
   status: 'Not Started' | 'In Progress' | 'Completed';
+  syllabus: string[];
+}
+
+export interface NSSTATPACProgram {
+  id: string;
+  title: string;
+  tpacCode: string;
+  category: 'Probationers' | 'In-Service' | 'Specialized Workshop' | 'Executive Leadership';
+  duration: string;
+  mode: 'Residential (NSSTA Greater Noida)' | 'Hybrid / Online' | 'Institutional Workshop';
+  targetCadre: string;
+  matchScore: number;
+  competency: string;
+  description: string;
+  upcomingBatchDate: string;
+  seatsAvailable: number;
+  nominationStatus: 'Open' | 'Nominated' | 'Waitlisted' | 'Completed';
   syllabus: string[];
 }
 
@@ -201,7 +221,9 @@ export interface OfficerProfile {
   role: string;
   division: string;
   karmayogiId: string;
-  avatarUrl: string;
+  avatarUrl?: string;
+  readinessScore?: number;
+  karmaPoints?: number;
 }
 
 

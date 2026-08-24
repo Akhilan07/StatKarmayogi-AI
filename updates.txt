@@ -1,0 +1,150 @@
+aug-23
+Summary of Solution & Data Terms Audit
+The platform build has completed successfully with 0 errors.
+
+Key Confirmations:
+Data Terms & Datasets Alignment (nssta.gov.in, mospi.gov.in, igotkarmayogi.gov.in): We are on exact terms with all official data standards. The platform incorporates official manuals (NSS 78th Round, PLFS, CPI, ASI, Data Quality V3, SDG NIF, DPDP Act 2023) and NSSTA TPAC recommended training calendars.
+Competency Engine: Full coverage across all 4 mandatory pillars:
+Statistical Competencies
+Technical Competencies
+Digital Governance
+Behavioural & Managerial Competencies
+Dual Personalised Recommendations:
+ Tailors learning pathways across both iGOT Karmayogi self-paced courses and NSSTA TPAC institutional training programmes.
+AI Assessment Engine: Generates objective MCQs/quizzes grounded in uploaded materials (PDFs, DOCX, Presentations, Video Transcripts) with Bloom's Taxonomy breakdown, instant evaluations, citations, and certificate generation.
+
+aug-23 multilingual updaate
+
+Multilingual Localization (i18n) Implementation Summary
+We have implemented a complete, production-ready multilingual localization (i18n) system supporting English (en), Hindi (hi), and Tamil (ta) across the StatKarmayogi platform.
+
+Features Implemented
+1. Language Context & State Management (/src/context/LanguageContext.tsx)
+State & Persistence: Created a React LanguageContext that maintains active language selection (en, hi, or ta) and automatically persists user preferences in localStorage (statkarmayogi_language).
+Translation Hook: Exposed useLanguage() providing the t(key, params) translation function, active language code, pending language state, and confirmation modal triggers.
+2. Sleek Language Selector UI (/src/components/TopNavBar.tsx)
+Location: Positioned in the top navigation bar next to user profile and notification icons.
+UI Elements: Features a Lucide Globe icon, native language label ("English", "हिंदी", "தமிழ்"), and language badge (EN, HI, TA).
+Dropdown Menu: Renders interactive language choices with native script labels and badges.
+3. Language Switch Confirmation Modal (/src/components/LanguageConfirmModal.tsx)
+Modal Trigger: Triggered whenever a user selects a new language from the dropdown menu.
+Modal Text: Displays the header "Switch Language / भाषा बदलें / மொழி மாற்றம்" asking:
+"Are you sure you want to change the interface language to [Selected Language]?" (Includes native script subtexts in Hindi & Tamil).
+
+Actions: Features Confirm and Cancel buttons to apply or discard changes.
+4. Multilingual Dictionary (/src/data/translations.ts)
+Comprehensive translations for all core UI elements across English, Hindi, and Tamil:
+
+Sidebar Navigation: Dashboard Overview, Competency Analyzer, iGOT Learning Path, Quiz & MCQ Generator, Analytics & Reports, AI Oral Viva.
+Dashboard & Officer Intelligence: Competency readiness scores, target benchmarks, critical skill deficits, karma points.
+Action Buttons: "Start Assessment", "Generate Personalized Learning Path", "Run Live AI Gap Analysis", "Generate Full Assessment Exam", "Sync with iGOT Learning Path".
+Assessment & Telemetry: Source Statistical Manuals, Bloom's Taxonomy focus, interactive preview labels, and division telemetry indicators.
+
+aug-23 variants
+
+Overview of Variants:
+Primary Build (Baseline): The standard enterprise MoSPI StatKarmayogi platform.
+Variant A: Admin Heavy (/builds/variant-a-admin-heavy):
+Focus: Ministry / DIID Leadership view.
+Features: National Readiness Index, department-level competency deficit matrix (FOD, SDRD, PSD, NAD, DPD, State DES), filterable risk levels, and TPAC batch allocation tracking.
+Variant B: Officer Gamified (/builds/variant-b-officer-gamified):
+Focus: Interactive officer experience.
+Features: Active 7-day study streak widget, daily diagnostic micro-quizzes with XP rewards, confetti animations, and iGOT mastery badge unlocks (Gold, Silver, Platinum tiers).
+Variant C: Live RAG Focus (/builds/variant-c-live-rag-focus):
+Focus: Split-screen manual-to-assessment workflow.
+Features: Dual-pane layout with source document reader and chunk embeddings inspector (cosine similarity scores) on the left, alongside real-time live AI MCQ synthesis on the right.
+2. Independent NPM Scripts in package.json
+Added isolated scripts in package.json to launch and test any variant independently:
+
+json
+"scripts": {
+  "dev:primary": "tsx server.ts",
+  "dev:admin": "VITE_DEFAULT_VARIANT=admin tsx server.ts",
+  "dev:gamified": "VITE_DEFAULT_VARIANT=gamified tsx server.ts",
+  "dev:rag": "VITE_DEFAULT_VARIANT=rag tsx server.ts"
+}
+3. Floating Dev Variant Switcher (DevVariantSwitcher.tsx)
+Floating Pill: Added a lightweight dev switcher pill positioned at the bottom-right corner during development.
+One-Click Switcher: Allows seamless instant preview switching between Primary Build, Variant A (Admin Heavy), Variant B (Gamified Officer), and Variant C (Live RAG Focus) without interrupting code execution or breaking the baseline build.
+4. Build Verification
+Passed production build verification with zero errors:
+
+Date: Aug 24, 2026
+Update Name: Authentication Security & Password Hashing Upgrade
+Briefing:
+- Password Security: Implemented salted bcrypt password hashing (12 rounds); plaintext passwords are never stored or logged.
+- JWT Protection: Signed and verified session tokens using environment secrets (JWT_SECRET & SESSION_SECRET).
+- Field Tampering Defense: Added request body sanitization stripping unauthorized privilege escalation attributes (isAdmin, permissions, __proto__).
+- Resource Ownership Check: Created verifyResourceOwnership middleware ensuring officers can only access their own resources (403 Forbidden on violation).
+- Standardized HTTP Statuses: Configured proper HTTP response codes (200, 201, 400, 401, 403, 404, 429, 500) and refactored authentication services.
+
+Date: Aug 24, 2026
+Update Name: Comprehensive Zod Request Validation Implementation
+Briefing:
+- Zod Schema Validation: Created strict Zod validation schemas for request body, query parameters, URL params, and file upload metadata.
+- Reusable Middleware: Built validateRequest higher-order middleware executing safeParse() on incoming requests before reaching route handlers.
+- Server-Side Security: Enforced strict server-side input validation so frontend input is never blindly trusted.
+- Helpful Error Feedback: Returns structured 400 Bad Request error details mapping invalid target fields to human-readable error messages.
+
+Date: Aug 24, 2026
+Update Name: SQL & Database Access Security Architecture
+Briefing:
+- Anti-SQLi Prepared Queries: Implemented executeParameterizedQuery enforcing positional parameter binding ($1, $2) and blocking unparameterized SQL string concatenation.
+- AES-256-GCM Encryption: Added encryptSensitiveData & decryptSensitiveData utilities powered by ENCRYPTION_KEY to protect officer PII and identity data.
+- Data Projection Sanitizer: Built sanitizeDbRecord & sanitizeResponseProjection middleware stripping internal DB fields (_id, password_hash, table_oid) from responses.
+- Authorized Mutation Guard: Enforced authorizeDatabaseMutation middleware verifying user ownership & role authorization prior to executing UPDATE or DELETE operations.
+
+Date: Aug 24, 2026
+Update Name: File Upload Security Architecture Implementation
+Briefing:
+- Strict Extension & MIME Filtering: Allowed only JPG, JPEG, PNG, and PDF files; dual-validated extension and MIME headers.
+- 5MB Max File Size Limit: Enforced strict 5MB upload size limits with Multer error handling returning 400 Bad Request.
+- Executable Protection: Blocked all executable extensions (.exe, .sh, .bat, .cmd, .js, .php) and dangerous script MIME types.
+- Path Traversal Defense & Random Filenames: Used path.basename() sanitization and generated secure random crypto filenames (sec_doc_timestamp_random.ext).
+
+Date: Aug 24, 2026
+Update Name: Frontend Security & XSS Defense Architecture
+Briefing:
+- DOMPurify XSS Sanitization: Implemented sanitizeHtml & escapeText utilities in src/utils/security.ts to clean user/AI content and prevent script injection.
+- Resilient Secure HTTP Client: Built secureHttpClient with a 15-second AbortController timeout and in-flight request deduplication to block duplicate submissions.
+- Friendly Error Handling & Loading States: Added useSecureAsync hook and user-friendly error formatting for 400/401/403/429/500 HTTP statuses.
+- API Layer Refactoring: Updated MoSPIAssessmentApiService to route all frontend API calls through secureHttpClient without altering the UI layout.
+
+Date: Aug 24, 2026
+Update Name: Production-Grade Logging & Monitoring Architecture
+Briefing:
+- Winston Daily Log Rotation: Configured winston & winston-daily-rotate-file for app, error, and security log rotation with retention caps.
+- Secrets Masking Engine: Created maskSensitiveData format automatically redacting passwords, JWT tokens, session secrets, and API keys.
+- Domain Audit Telemetry: Created reusable loggers for authentication attempts (logAuthAttempt), file uploads (logFileUpload), AI operations (logAiRequest), and API failures (logApiFailure).
+- HTTP Request Middleware: Attached httpLoggerMiddleware calculating request execution duration, status codes, and IP addresses.
+
+Date: Aug 24, 2026
+Update Name: Comprehensive UX Polish & Accessibility Suite Implementation
+Briefing:
+- Toast Notification System: Built ToastContext & ToastProvider rendering floating toasts with auto-dismiss and aria-live polite regions.
+- Skeleton Shimmer Loaders: Created CardSkeleton, QuizSkeleton, and TableSkeleton components for smooth state transitions.
+- Empty State Screens: Created EmptyState component with illustrations and action triggers for empty datasets.
+- Offline Detection Banner: Built OfflineBanner monitoring navigator.onLine with automatic reconnect feedback.
+- Retry & Error Fallbacks: Built RetryCard with explicit operation retry triggers, Error404Page, and Error500Page fallback screens.
+
+Date: Aug 24, 2026
+Update Name: Resolved Blank Screen Issue & Restored Component Tree
+Briefing:
+- Component Import Restoration: Restored missing LanguageConfirmModal import in src/App.tsx to eliminate runtime ReferenceError.
+- Zod v4 Type Alignment: Updated Zod string schema definitions in server/validation/schemas.ts for clean compilation.
+- Production Verification: Passed typescript verification (tsc --noEmit) and production bundle compilation (npm run build).
+
+Date: Aug 24, 2026
+Update Name: Dependency Security Audit & Build Optimization
+Briefing:
+- Zero Vulnerabilities (npm audit): Upgraded pdfjs-dist from vulnerable 3.11.174 to secure release (pdfjs-dist@4.10.38), eliminating all security advisories.
+- Deprecated Package Patching: Cleaned up legacy dependency trees and resolved tar hardlink vulnerabilities.
+- Build Performance & Chunk Splitting: Configured Rollup manualChunks vendor splitting in vite.config.ts for fast parallel bundle loading.
+- Production Verification: Passed tsc --noEmit and npm run build verification with exit code 0.
+
+Date: Aug 24, 2026
+Update Name: Dedicated Landing Page & Deep Multilingual Content Expansion
+Briefing:
+- Dedicated Landing & SSO Portal: Built LandingLoginPage.tsx providing an official MoSPI & iGOT Karmayogi landing page with officer card selection and SSO authentication.
+- Deep Trilingual Competency Translations: Expanded translations.ts with full Hindi and Tamil translations for all 15 competency domains, status tags, and portal capabilities.
+- Seamless Authentication Flow: Integrated unauthenticated landing page routing in src/App.tsx with top-nav sign out / switch officer triggers returning to the portal entry.

@@ -13,6 +13,7 @@ import {
   Mic
 } from 'lucide-react';
 import { AppLanguage, OfficerProfile, TabType } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SideNavBarProps {
   activeTab: TabType;
@@ -31,10 +32,10 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
   onStartTraining,
   isMobileOpen = false,
   setIsMobileOpen,
-  language = 'en',
   user,
   onOpenLogin,
 }) => {
+  const { t, language } = useLanguage();
   const isHindi = language === 'hi';
   const isTamil = language === 'ta';
 
@@ -42,22 +43,22 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
     {
       title: isTamil ? 'முக்கிய பணிப்பகுதி' : isHindi ? 'मुख्य कार्यक्षेत्र' : 'CORE WORKSPACE',
       items: [
-        { id: 'dashboard' as TabType, label: isTamil ? 'டாஷ்போர்டு மேலோட்டம்' : isHindi ? 'अधिकारी अवलोकन' : 'Dashboard Overview', icon: LayoutDashboard },
-        { id: 'competency' as TabType, label: isTamil ? 'திறன் பகுப்பாய்வு' : isHindi ? 'दक्षता विश्लेषण' : 'Competency Matrix', icon: BarChart3 },
+        { id: 'dashboard' as TabType, label: t('nav_dashboard'), icon: LayoutDashboard },
+        { id: 'competency' as TabType, label: t('nav_competency'), icon: BarChart3 },
       ],
     },
     {
       title: isTamil ? 'AI மதிப்பீடு' : isHindi ? 'AI मूल्यांकन' : 'EVALUATION & VIVA',
       items: [
-        { id: 'viva' as TabType, label: isTamil ? 'AI வாய்மொழித் தேர்வு' : isHindi ? 'AI मौखिक साक्षात्कार' : 'AI Viva Examiner', icon: Mic, badge: isTamil ? 'புதியது' : isHindi ? 'नया' : 'New' },
-        { id: 'generator' as TabType, label: isTamil ? 'கையேடுகள் & வினாடி வினா' : isHindi ? 'मैनुअल प्रश्नोत्तरी' : 'Manuals & Quiz AI', icon: FileQuestion },
+        { id: 'viva' as TabType, label: t('nav_viva'), icon: Mic, badge: isTamil ? 'புதியது' : isHindi ? 'नया' : 'New' },
+        { id: 'generator' as TabType, label: t('nav_generator'), icon: FileQuestion },
       ],
     },
     {
       title: isTamil ? 'கற்றல் & அளவீடு' : isHindi ? 'अधिगम एवं रिपोर्ट' : 'GROWTH & TELEMETRY',
       items: [
-        { id: 'igot' as TabType, label: isTamil ? 'iGOT கற்றல் பாதை' : isHindi ? 'iGOT अधिगम मार्ग' : 'iGOT Learning Path', icon: GraduationCap },
-        { id: 'analytics' as TabType, label: isTamil ? 'பகுப்பாய்வு & அறிக்கைகள்' : isHindi ? 'विश्लेषण एवं रिपोर्ट' : 'Analytics & Telemetry', icon: LineChart },
+        { id: 'igot' as TabType, label: t('nav_igot'), icon: GraduationCap },
+        { id: 'analytics' as TabType, label: t('nav_analytics'), icon: LineChart },
       ],
     },
   ];

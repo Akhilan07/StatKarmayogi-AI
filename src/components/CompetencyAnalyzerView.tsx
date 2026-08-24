@@ -19,6 +19,8 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { CompetencyDomain, TabType, CompetencyGapAnalysisResult } from '../types';
+import { MoSPIAssessmentApiService } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 interface CompetencyAnalyzerViewProps {
   competencies: CompetencyDomain[];
@@ -26,18 +28,47 @@ interface CompetencyAnalyzerViewProps {
   onLaunchTargetedQuiz: (competencyName: string) => void;
 }
 
+const getTranslatedCompetencyTitle = (name: string, t: any) => {
+  if (name.includes('Survey Design')) return t('comp_survey_design');
+  if (name.includes('Price Statistics') || name.includes('CPI')) return t('comp_cpi_iip');
+  if (name.includes('National Accounts')) return t('comp_national_accounts');
+  if (name.includes('Labour Statistics') || name.includes('PLFS')) return t('comp_plfs_labour');
+  if (name.includes('Agricultural & Industrial') || name.includes('ASI')) return t('comp_asi_stats');
+  if (name.includes('SDG Indicators')) return t('comp_sdg_nif');
+  if (name.includes('Data Quality')) return t('comp_data_quality');
+  if (name.includes('Python & R')) return t('comp_python_r');
+  if (name.includes('Database & Statistical') || name.includes('SQL')) return t('comp_sql_stata');
+  if (name.includes('GIS & Spatial')) return t('comp_gis_spatial');
+  if (name.includes('AI/ML')) return t('comp_ai_ml_cloud');
+  if (name.includes('Data Privacy') || name.includes('DPDP')) return t('comp_dpdp_privacy');
+  if (name.includes('Government Cloud') || name.includes('MeghRaj')) return t('comp_meghraj_cloud');
+  if (name.includes('Leadership & Survey')) return t('comp_survey_mgmt');
+  if (name.includes('Communication')) return t('comp_ethics_comm');
+  return name;
+};
+
+const getTranslatedStatus = (status: string, t: any) => {
+  if (status === 'Critical Gap' || status === 'Critical Deficit') return t('status_critical_gap');
+  if (status === 'Gap Identified' || status === 'Moderate Gap') return t('status_moderate_gap');
+  return t('status_proficient');
+};
+
 export const CompetencyAnalyzerView: React.FC<CompetencyAnalyzerViewProps> = ({
   competencies,
   setActiveTab,
   onLaunchTargetedQuiz,
 }) => {
+  const { t } = useLanguage();
   const [selectedRole, setSelectedRole] = useState<string>('Senior Statistical Officer');
+  const [selectedPillar, setSelectedPillar] = useState<string>('All Pillars');
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
   const [aiGapResult, setAiGapResult] = useState<CompetencyGapAnalysisResult | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncSuccess, setSyncSuccess] = useState<boolean>(false);
   const [showSystemPromptModal, setShowSystemPromptModal] = useState<boolean>(false);
   const [copiedPrompt, setCopiedPrompt] = useState<boolean>(false);
+
+  const pillars = ['All Pillars', 'Statistical', 'Technical', 'Digital Governance', 'Behavioural & Managerial'];
 
   const SYSTEM_INSTRUCTION_PROMPT = `You are the MoSPI Competency Evaluation Engine.
 
@@ -69,27 +100,24 @@ Output strictly valid JSON matching the following structure:
   const handleRunAiEvaluation = async () => {
     setIsEvaluating(true);
     try {
-      const res = await fetch('/api/competency-gap-analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          officerRole: selectedRole,
-          targetBenchmark: 80,
-          currentCompetencies: competencies.map(c => ({
-            name: c.name,
-            currentScore: Math.round((c.currentLevel / 5) * 100),
-            benchmarkScore: Math.round((c.peerBenchmark / 5) * 100)
-          }))
-        })
+      const data = await MoSPIAssessmentApiService.evaluateCompetencyGaps({
+        officerRole: selectedRole,
+        targetBenchmark: 80,
+        currentCompetencies: competencies.map(c => ({
+          name: c.name,
+          currentScore: Math.round((c.currentLevel / 5) * 100),
+          benchmarkScore: Math.round((c.peerBenchmark / 5) * 100)
+        }))
       });
 
-      const data = await res.json();
-      if (data.success && data.analysis) {
+      if (data && data.success && data.analysis) {
+        setAiGapResult(data.analysis);
+      } else if (data && data.analysis) {
         setAiGapResult(data.analysis);
       } else {
-        throw new Error(data.error || 'Evaluation failed');
+        throw new Error(data.error || 'Evaluation failed. Please try again.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.warn('AI evaluation error, using calibrated default analysis:', err);
       // Calibrated baseline response conforming to user schema
       setAiGapResult({
@@ -207,14 +235,34 @@ Output strictly valid JSON matching the following structure:
               </div>
             </div>
 
+            {/* 4 Pillars Filter Tabs */}
+            <div className="flex flex-wrap gap-2 mb-6 pb-2 border-b border-slate-100">
+              {pillars.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setSelectedPillar(p)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    selectedPillar === p
+                      ? 'bg-[#006c4a] text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+
             {/* Range Bar Items */}
             <div className="space-y-6">
-              {(aiGapResult?.competency_scores || competencies.map(c => ({
-                competency: c.name,
-                score: Math.round((c.currentLevel / 5) * 100),
-                benchmark: Math.round((c.peerBenchmark / 5) * 100),
-                status: c.status === 'Critical Gap' ? 'Critical Gap' : c.status === 'High Gap' ? 'Gap Identified' : 'Proficient'
-              }))).map((comp: any, idx: number) => {
+              {(aiGapResult?.competency_scores || competencies
+                .filter(c => selectedPillar === 'All Pillars' || c.pillar === selectedPillar)
+                .map(c => ({
+                  competency: c.name,
+                  pillar: c.pillar,
+                  score: Math.round((c.currentLevel / 5) * 100),
+                  benchmark: Math.round((c.peerBenchmark / 5) * 100),
+                  status: c.status === 'Critical Gap' ? 'Critical Gap' : c.status === 'High Gap' ? 'Gap Identified' : 'Proficient'
+                }))).map((comp: any, idx: number) => {
                 const isCritical = comp.status === 'Critical Gap';
                 const isGap = comp.status === 'Gap Identified' || isCritical;
                 const scorePct = comp.score;
@@ -224,7 +272,7 @@ Output strictly valid JSON matching the following structure:
                   <div key={idx} className="relative group">
                     <div className="flex justify-between items-center mb-1.5 text-xs sm:text-sm font-semibold">
                       <span className="text-slate-800 flex items-center gap-2">
-                        <span>{comp.competency}</span>
+                        <span>{getTranslatedCompetencyTitle(comp.competency, t)}</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                           isCritical
                             ? 'bg-red-100 text-red-800 border border-red-200'
@@ -232,7 +280,7 @@ Output strictly valid JSON matching the following structure:
                             ? 'bg-amber-100 text-amber-800 border border-amber-200'
                             : 'bg-emerald-100 text-[#006c4a] border border-emerald-200'
                         }`}>
-                          {comp.status}
+                          {getTranslatedStatus(comp.status, t)}
                         </span>
                       </span>
                       <span className={isCritical ? 'text-red-700 font-bold' : isGap ? 'text-amber-700 font-bold' : 'text-[#006c4a] font-bold'}>

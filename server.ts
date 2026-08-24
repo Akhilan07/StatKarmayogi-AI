@@ -3,13 +3,73 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+
+// Import modular security middleware
+import { configureSecurityHeaders } from "./server/middleware/securityHeaders";
+import { configureCors } from "./server/middleware/corsConfig";
+import { enforceHttps } from "./server/middleware/httpsRedirect";
+import {
+  authLimiter,
+  aiLimiter,
+  uploadLimiter,
+  generalApiLimiter,
+} from "./server/middleware/rateLimiters";
+import { centralizedErrorHandler } from "./server/middleware/errorHandler";
+import {
+  handleOfficerLogin,
+  handleOfficerRegister,
+  handleOfficerLogout,
+  handleOfficerSessionCheck,
+  authenticateOfficer,
+  verifyResourceOwnership,
+} from "./server/middleware/authSecurity";
+import { validateRequest } from "./server/middleware/validateRequest";
+import {
+  loginSchema,
+  registerSchema,
+  generateMcqsSchema,
+  competencyGapSchema,
+  analyzeManualSchema,
+  vivaQuestionSchema,
+  vivaEvaluateSchema,
+  officerParamSchema,
+} from "./server/validation/schemas";
+import { sanitizeResponseProjection, authorizeDatabaseMutation } from "./server/middleware/dbSecurity";
+import { secureUpload, handleUploadErrors } from "./server/middleware/uploadSecurity";
+import { httpLoggerMiddleware } from "./server/middleware/httpLogger";
+import { logFileUpload, logAiRequest, logger } from "./server/logging/logger";
 
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const parsedPort = Number.parseInt(process.env.PORT || "3000", 10);
+const PORT = Number.isInteger(parsedPort) && parsedPort > 0 ? parsedPort : 3000;
 
+// 1. Production HTTP Telemetry & Access Logger
+app.use(httpLoggerMiddleware);
+
+// 2. Force HTTPS in production
+app.use(enforceHttps);
+
+// 3. Helmet HTTP Security Headers (CSP, HSTS, Anti-XSS, Frameguard)
+app.use(configureSecurityHeaders());
+
+// 4. CORS origin restriction middleware
+app.use(configureCors());
+
+// 5. Secure Cookie Parser
+app.use(cookieParser(process.env.SESSION_SECRET || "default_dev_secret"));
+
+// 6. Body Parser with payload limit
 app.use(express.json({ limit: "50mb" }));
+
+// 7. Global API Rate Limiter
+app.use("/api", generalApiLimiter);
+
+// 8. Database Response Data Projection Sanitizer & Mutation Authorization Guard
+app.use("/api", sanitizeResponseProjection);
+app.use("/api", authorizeDatabaseMutation);
 
 // Server-side Gemini initialization with telemetry header
 const getGeminiClient = () => {
@@ -32,9 +92,25 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Authentication & Session Routes (with tight auth rate limiter, Zod request validation, bcrypt hashing, and JWT session handling)
+app.post("/api/auth/register", authLimiter, validateRequest({ body: registerSchema }), handleOfficerRegister);
+app.post("/api/auth/login", authLimiter, validateRequest({ body: loginSchema }), handleOfficerLogin);
+app.post("/api/login", authLimiter, validateRequest({ body: loginSchema }), handleOfficerLogin);
+app.post("/api/auth/logout", handleOfficerLogout);
+app.get("/api/auth/me", authenticateOfficer, handleOfficerSessionCheck);
+
+// Resource Ownership Verification Endpoint (Ensures officers can only access their own resources)
+app.get("/api/officer/:officerId/profile", authenticateOfficer, validateRequest({ params: officerParamSchema }), verifyResourceOwnership, (req, res) => {
+  res.status(200).json({
+    success: true,
+    user: (req as any).user,
+    message: "Resource ownership verified.",
+  });
+});
+
 // API Route: Generate Rigorous Bloom's Taxonomy MCQs from MoSPI Manuals
 // Conforms to the MoSPI Karmayogi MCQ JSON Output Schema
-app.post("/api/generate-mcqs", async (req, res) => {
+app.post("/api/generate-mcqs", aiLimiter, validateRequest({ body: generateMcqsSchema }), async (req, res, next) => {
   try {
     const {
       manualText,
@@ -182,17 +258,13 @@ Adhere strictly to the requested JSON response schema. Ensure options are 4 stri
       raw_quiz_output: parsed,
     });
   } catch (error: any) {
-    console.error("Error generating MCQs with Gemini:", error);
-    return res.status(500).json({
-      success: false,
-      error: error.message || "Failed to generate assessment questions.",
-    });
+    next(error);
   }
 });
 
 // API Route: MoSPI Competency Evaluation Engine (Gap Analysis & iGOT Mapping)
 // System Instruction & Schema from Google AI Studio
-app.post("/api/competency-gap-analysis", async (req, res) => {
+app.post("/api/competency-gap-analysis", aiLimiter, validateRequest({ body: competencyGapSchema }), async (req, res, next) => {
   try {
     const {
       officerRole = "Statistical Officer",
@@ -295,16 +367,42 @@ Calculate realistic, precise readiness percentage and high-impact iGOT Karmayogi
       analysis: parsed,
     });
   } catch (error: any) {
-    console.error("Error in competency gap evaluation:", error);
-    return res.status(500).json({
-      success: false,
-      error: error.message || "Failed to evaluate competency gaps.",
-    });
+    next(error);
   }
 });
 
+// API Route: Secure Document File Upload (Validates JPG, JPEG, PNG, PDF <= 5MB, blocks executables & Path Traversal)
+app.post("/api/upload-manual", uploadLimiter, secureUpload.single("manualFile"), handleUploadErrors, (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      error: "File Upload Error: No file uploaded or invalid form field. Expected field 'manualFile'.",
+    });
+  }
+
+  logFileUpload({
+    filename: req.file.filename,
+    originalName: req.file.originalname,
+    mimeType: req.file.mimetype,
+    sizeBytes: req.file.size,
+    ip: req.ip || '',
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Statistical manual file uploaded and validated successfully.",
+    file: {
+      originalName: req.file.originalname,
+      sanitizedFilename: req.file.filename,
+      sizeBytes: req.file.size,
+      mimeType: req.file.mimetype,
+      savedPath: `/uploads/${req.file.filename}`,
+    },
+  });
+});
+
 // API Route: Analyze Manual & Extract Competencies
-app.post("/api/analyze-manual", async (req, res) => {
+app.post("/api/analyze-manual", uploadLimiter, validateRequest({ body: analyzeManualSchema }), async (req, res, next) => {
   try {
     const { manualText, filename = "Official Document" } = req.body;
     if (!manualText) {
@@ -357,13 +455,12 @@ ${manualText.slice(0, 10000)}`,
     const parsed = JSON.parse(response.text || "{}");
     return res.json({ success: true, analysis: parsed });
   } catch (error: any) {
-    console.error("Error analyzing manual:", error);
-    return res.status(500).json({ success: false, error: error.message });
+    next(error);
   }
 });
 
 // API Route: AI Viva Examiner - Ask Question
-app.post("/api/viva-examiner/question", async (req, res) => {
+app.post("/api/viva-examiner/question", aiLimiter, validateRequest({ body: vivaQuestionSchema }), async (req, res, next) => {
   try {
     const { topic = "Survey Sampling Techniques", officerRole = "Senior Statistical Officer", difficulty = "Intermediate", language = "en", chatHistory = [] } = req.body;
     const ai = getGeminiClient();
@@ -400,13 +497,12 @@ Keep your question focused, professional, and encouraging. Ask ONLY the question
     const parsed = JSON.parse(response.text || "{}");
     return res.json({ success: true, data: parsed });
   } catch (error: any) {
-    console.error("Error in viva question generation:", error);
-    return res.status(500).json({ success: false, error: error.message });
+    next(error);
   }
 });
 
 // API Route: AI Viva Examiner - Evaluate Answer
-app.post("/api/viva-examiner/evaluate", async (req, res) => {
+app.post("/api/viva-examiner/evaluate", aiLimiter, validateRequest({ body: vivaEvaluateSchema }), async (req, res, next) => {
   try {
     const { question, officerAnswer, topic = "Statistical Operations", officerRole = "Senior Statistical Officer", language = "en" } = req.body;
     if (!question || !officerAnswer) {
@@ -451,12 +547,16 @@ Evaluate strictly and return JSON.`;
     });
 
     const parsed = JSON.parse(response.text || "{}");
-    return res.json({ success: true, evaluation: parsed });
+    // Keep a single response envelope across the AI endpoints. The frontend
+    // consumes `data`, as it already does for generated viva questions.
+    return res.json({ success: true, data: parsed });
   } catch (error: any) {
-    console.error("Error in viva answer evaluation:", error);
-    return res.status(500).json({ success: false, error: error.message });
+    next(error);
   }
 });
+
+// Centralized error handling middleware
+app.use(centralizedErrorHandler);
 
 // Setup Vite middleware for full-stack integration
 async function start() {

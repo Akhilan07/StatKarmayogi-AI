@@ -21,6 +21,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { AppLanguage, OfficerProfile, TabType } from '../types';
+import { useLanguage } from '../context/LanguageContext';
+import { LanguageCode } from '../data/translations';
 
 interface TopNavBarProps {
   onSearch?: (query: string) => void;
@@ -110,7 +112,6 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
   setActiveTab,
   targetScore,
   currentScore,
-  language = 'en',
   onChangeLanguage,
   karmaPoints = 750,
   user = {
@@ -122,14 +123,20 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
   },
   onOpenLogin,
 }) => {
+  const { language, selectLanguage } = useLanguage();
+  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
-  
-  // Language Change Confirmation Modal State
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
-  const [pendingLanguage, setPendingLanguage] = useState<AppLanguage>(language);
+
+  const languageOptions = [
+    { code: 'en' as AppLanguage, label: 'English', badge: 'EN' },
+    { code: 'hi' as AppLanguage, label: 'हिंदी', badge: 'HI' },
+    { code: 'ta' as AppLanguage, label: 'தமிழ்', badge: 'TA' },
+  ];
+
+  const currentOption = languageOptions.find((l) => l.code === language) || languageOptions[0];
 
   const notifications = [
     {
@@ -177,24 +184,6 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
     e.preventDefault();
     if (filteredSearchResults.length > 0) {
       handleSelectSearchResult(filteredSearchResults[0]);
-    }
-  };
-
-  const handleConfirmLanguageChange = () => {
-    if (onChangeLanguage) {
-      onChangeLanguage(pendingLanguage);
-    }
-    setShowLanguageModal(false);
-  };
-
-  const getLanguageLabel = (lang: string | AppLanguage) => {
-    switch (lang) {
-      case 'hi':
-        return 'हिन्दी (HI)';
-      case 'ta':
-        return 'தமிழ் (TA)';
-      default:
-        return 'English (EN)';
     }
   };
 
@@ -298,20 +287,51 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
         </div>
       </div>
 
-      {/* Right: Language Switcher with Modal, KarmaPoints, Profile */}
+      {/* Right: Language Switcher Dropdown, KarmaPoints, Profile */}
       <div className="flex items-center gap-3 md:gap-4">
-        {/* Language Switcher Button (Opens Confirmation Modal) */}
-        <button
-          onClick={() => {
-            setPendingLanguage(language);
-            setShowLanguageModal(true);
-          }}
-          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-800 transition-all shadow-xs"
-          title="Switch Language / भाषा / தமிழ்"
-        >
-          <Globe className="w-3.5 h-3.5 text-[#006c4a]" />
-          <span>{getLanguageLabel(language)}</span>
-        </button>
+        {/* Language Switcher Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-800 transition-all shadow-xs"
+            title="Switch Language / भाषा बदलें / மொழி மாற்றம்"
+          >
+            <Globe className="w-3.5 h-3.5 text-[#006c4a]" />
+            <span>{currentOption.label}</span>
+            <span className="bg-[#006c4a] text-white text-[10px] font-mono px-1.5 py-0.2 rounded font-bold">
+              {currentOption.badge}
+            </span>
+          </button>
+
+          {isLangDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2.5 py-1 mb-1 border-b border-slate-100">
+                Select Interface Language
+              </div>
+              {languageOptions.map((opt) => (
+                <button
+                  key={opt.code}
+                  onClick={() => {
+                    setIsLangDropdownOpen(false);
+                    selectLanguage(opt.code as LanguageCode);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
+                    language === opt.code
+                      ? 'bg-emerald-50 text-[#006c4a] border border-emerald-200'
+                      : 'hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <span>{opt.label}</span>
+                  </span>
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                    {opt.badge}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* KarmaPoints Badge */}
         <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-extrabold" title="iGOT KarmaPoints">
@@ -394,86 +414,6 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Language Selection & Confirmation Modal (English, Hindi, Tamil) */}
-      {showLanguageModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in zoom-in-95">
-            <div className="flex justify-between items-start">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#006c4a] flex items-center justify-center font-bold shadow-xs">
-                  <Globe className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-slate-900">Select Language / மொழி बदलें</h3>
-                  <p className="text-xs text-slate-500">Choose official evaluation language</p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowLanguageModal(false)}
-                className="p-1 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-2.5">
-              {[
-                { code: 'en' as AppLanguage, name: 'English', native: 'English (Default)', desc: 'Official English MoSPI Manuals & Evaluation' },
-                { code: 'hi' as AppLanguage, name: 'हिन्दी', native: 'Hindi', desc: 'हिन्दी भाषा एवं मोस्पी प्रश्नोत्तरी' },
-                { code: 'ta' as AppLanguage, name: 'தமிழ்', native: 'Tamil', desc: 'தமிழ் மொழியில் மதிப்பீடு மற்றும் உரையாடல்' },
-              ].map((langObj) => {
-                const isSelected = pendingLanguage === langObj.code;
-                return (
-                  <div
-                    key={langObj.code}
-                    onClick={() => setPendingLanguage(langObj.code)}
-                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                      isSelected
-                        ? 'bg-emerald-50/90 border-[#006c4a] shadow-xs ring-1 ring-[#006c4a]/30'
-                        : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                        <span>{langObj.name}</span>
-                        <span className="text-xs font-normal text-slate-500">({langObj.native})</span>
-                      </h4>
-                      <p className="text-xs text-slate-500 mt-0.5">{langObj.desc}</p>
-                    </div>
-
-                    {isSelected && <Check className="w-5 h-5 text-[#006c4a] stroke-[3]" />}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-700" />
-              <span>
-                <strong>Confirmation Required:</strong> Changing language will update the AI Viva Examiner prompts and MCQ generation engine to <strong>{getLanguageLabel(pendingLanguage)}</strong>.
-              </span>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <button
-                onClick={() => setShowLanguageModal(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmLanguageChange}
-                className="px-5 py-2.5 bg-[#006c4a] hover:bg-[#005137] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
-              >
-                <span>Confirm &amp; Switch Language</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Framework Help Modal */}
       {showHelpModal && (

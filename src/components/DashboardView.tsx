@@ -23,6 +23,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { CompetencyDomain, OfficerProfile, TabType, AppLanguage } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface DashboardViewProps {
   competencies: CompetencyDomain[];
@@ -45,8 +46,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     avatarUrl: '',
   },
   onOpenLogin,
-  language = 'en',
 }) => {
+  const { t, language } = useLanguage();
   const isHindi = language === 'hi';
   const isTamil = language === 'ta';
   const [hoveredAxis, setHoveredAxis] = useState<string | null>(null);

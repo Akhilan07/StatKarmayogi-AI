@@ -6,6 +6,7 @@ import {
   AssessmentResult, 
   VivaTurn 
 } from '../types';
+import { secureHttpClient } from './secureHttpClient';
 
 export interface QuizGenerationPayload {
   manualText: string;
@@ -59,14 +60,17 @@ export interface VivaEvaluationResponse {
     grade: 'A' | 'B' | 'C' | 'D';
     summary_feedback: string;
     strengths: string[];
-    gap_areas: string[];
+    gaps: string[];
     manual_citation: string;
+    recommended_reading?: string;
   };
   error?: string;
 }
 
 /**
  * Service Abstraction for MoSPI Competency AI Operations
+ * Utilizes secureHttpClient for request timeout protection, in-flight request deduplication,
+ * friendly error messages, and XSS string sanitization.
  */
 export class MoSPIAssessmentApiService {
   /**
@@ -74,17 +78,11 @@ export class MoSPIAssessmentApiService {
    */
   public static async generateQuizFromManual(payload: QuizGenerationPayload): Promise<QuizGenerationResponse> {
     try {
-      const response = await fetch('/api/generate-quiz', {
+      return await secureHttpClient<QuizGenerationResponse>('/api/generate-mcqs', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        timeoutMs: 20000, // 20s timeout for complex AI generation
       });
-
-      if (!response.ok) {
-        throw new Error(`Server returned status HTTP ${response.status}`);
-      }
-
-      return await response.json();
     } catch (error: any) {
       console.warn('[MoSPIApiService] API quiz generation exception:', error.message);
       return {
@@ -99,17 +97,11 @@ export class MoSPIAssessmentApiService {
    */
   public static async fetchVivaQuestion(payload: VivaQuestionPayload): Promise<VivaQuestionResponse> {
     try {
-      const response = await fetch('/api/viva-examiner/question', {
+      return await secureHttpClient<VivaQuestionResponse>('/api/viva-examiner/question', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        timeoutMs: 15000,
       });
-
-      if (!response.ok) {
-        throw new Error(`Server returned HTTP ${response.status}`);
-      }
-
-      return await response.json();
     } catch (error: any) {
       console.warn('[MoSPIApiService] Viva question fetch exception:', error.message);
       return {
@@ -124,22 +116,35 @@ export class MoSPIAssessmentApiService {
    */
   public static async evaluateVivaResponse(payload: VivaEvaluationPayload): Promise<VivaEvaluationResponse> {
     try {
-      const response = await fetch('/api/viva-examiner/evaluate', {
+      return await secureHttpClient<VivaEvaluationResponse>('/api/viva-examiner/evaluate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        timeoutMs: 15000,
       });
-
-      if (!response.ok) {
-        throw new Error(`Server returned HTTP ${response.status}`);
-      }
-
-      return await response.json();
     } catch (error: any) {
       console.warn('[MoSPIApiService] Viva evaluation exception:', error.message);
       return {
         success: false,
         error: error.message || 'Failed to evaluate candidate oral response.',
+      };
+    }
+  }
+
+  /**
+   * Evaluates officer competency gaps and iGOT module mapping
+   */
+  public static async evaluateCompetencyGaps(payload: any): Promise<any> {
+    try {
+      return await secureHttpClient<any>('/api/competency-gap-analysis', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        timeoutMs: 15000,
+      });
+    } catch (error: any) {
+      console.warn('[MoSPIApiService] Competency gap evaluation exception:', error.message);
+      return {
+        success: false,
+        error: error.message || 'Failed to analyze competency gaps.',
       };
     }
   }

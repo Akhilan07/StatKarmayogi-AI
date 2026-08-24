@@ -196,7 +196,7 @@ export const VivaExaminerView: React.FC<VivaExaminerViewProps> = ({
           grade: data.data.grade,
           summary_feedback: data.data.summary_feedback,
           strengths: data.data.strengths,
-          gaps: data.data.gap_areas,
+          gaps: data.data.gaps,
           manual_citation: data.data.manual_citation,
           recommended_reading: 'iGOT Module: Advanced Survey Sampling',
         };
@@ -237,20 +237,14 @@ export const VivaExaminerView: React.FC<VivaExaminerViewProps> = ({
     setIsLoadingQuestion(true);
 
     try {
-      const history = session.turns.map((t) => ({ q: t.question, a: t.userAnswer }));
-      const res = await fetch('/api/viva-examiner/question', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          topic: session.topic,
-          officerRole: session.officerRole,
-          difficulty: session.difficulty,
-          language,
-          chatHistory: history,
-        }),
+      const history = session.turns.map((t) => ({ question: t.question, answer: t.userAnswer }));
+      const data = await MoSPIAssessmentApiService.fetchVivaQuestion({
+        topic: session.topic,
+        officerRole: session.officerRole,
+        difficulty: session.difficulty,
+        language,
+        chatHistory: history as any,
       });
-
-      const data = await res.json();
       let nextQuestionText = 'How do you handle non-response or missing household schedules during field audit operations?';
       let contextHint = 'Refer to substitution rules vs re-visiting protocols.';
       let targetConcepts = ['Non-Response Handling', 'Substitution Protocol'];

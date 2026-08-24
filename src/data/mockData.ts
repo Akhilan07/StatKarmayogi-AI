@@ -1,4 +1,4 @@
-import { OfficialManual, CompetencyDomain, IGOTCourse, LearningHistoryItem, Question } from '../types';
+import { OfficialManual, CompetencyDomain, IGOTCourse, LearningHistoryItem, Question, NSSTATPACProgram } from '../types';
 
 export const OFFICIAL_MANUALS: OfficialManual[] = [
   {
@@ -135,6 +135,65 @@ export const OFFICIAL_MANUALS: OfficialManual[] = [
     ]
   },
   {
+    id: 'nssta-tpac-manual',
+    title: 'NSSTA TPAC Curriculum & Annual Capacity Building Calendar 2024-25',
+    code: 'NSSTA-TPAC-2024',
+    department: 'National Statistical Systems Training Academy (NSSTA Greater Noida)',
+    year: '2024-25',
+    pages: 145,
+    fileSize: '3.8 MB',
+    summary: 'Authoritative Training Programme Advisory Committee (TPAC) guidelines for ISS/SSS probationers and in-service officers, defining mandatory competency frameworks, virtual lab modules, and institutional workshops.',
+    keyCompetencies: ['Statistical Competencies', 'Technical Competencies', 'Digital Governance', 'Behavioural and Managerial Competencies'],
+    sampleText: `NSSTA TPAC CAPACITY BUILDING FRAMEWORK 2024-25
+1. Mandate of NSSTA: The National Statistical Systems Training Academy (NSSTA), located in Greater Noida, serves as the premier institute for capacity building in Official Statistics for India's Central and State Statistical System.
+2. Role of TPAC: The Training Programme Advisory Committee (TPAC) approves annual in-service training calendars, probationer curricula, and competency-linked training recommendations for Indian Statistical Service (ISS) and Subordinate Statistical Service (SSS) cadres.
+3. Four Core Competency Pillars:
+   - Statistical Competencies: Survey Design, Sampling, National Accounts, Price Statistics, Labour Statistics, Agricultural Statistics, Industrial Statistics, SDG Indicators, Metadata Standards, and Data Quality Frameworks.
+   - Technical Competencies: Python, R, SQL, Stata, SPSS, SAS, GIS, Data Visualization, AI/ML, Cloud Computing, APIs, and Open Data.
+   - Digital Governance: Cybersecurity, Data Privacy, Digital Signatures, Government Cloud, and Digital Public Infrastructure.
+   - Behavioural & Managerial Competencies: Leadership, Communication, Project Management, Ethics, Decision Making, and Change Management.
+4. iGOT Karmayogi Integration: TPAC mandates continuous online learning via iGOT Karmayogi combined with mandatory hands-on virtual labs and oral viva examinations for probationers.`,
+    sections: [
+      {
+        id: 'nssta-sec-1',
+        title: 'Section 1: Core Cadre Competency Mapping (ISS & SSS)',
+        content: 'Detailed competency levels (Levels 1 to 5) required for Junior Time Scale, Senior Time Scale, JAG, and Senior Administrative Grade officers.'
+      },
+      {
+        id: 'nssta-sec-2',
+        title: 'Section 2: TPAC In-Service Recommended Training Programmes',
+        content: 'Standard operating procedure for departmental nominations, evaluation benchmarks, and Karma Points credit transfers to iGOT Karmayogi profiles.'
+      }
+    ]
+  },
+  {
+    id: 'sdg-nif-manual',
+    title: 'SDG India National Indicator Framework (NIF) & Metadata Standards',
+    code: 'MOSPI-SDG-NIF-2024',
+    department: 'Social Statistics Division (SSD / MoSPI)',
+    year: '2024',
+    pages: 210,
+    fileSize: '4.5 MB',
+    summary: 'Official metadata guidelines for tracking 17 Sustainable Development Goals, 169 targets, national indicators, data sources, computation formulas, and disaggregation standards.',
+    keyCompetencies: ['SDG Indicators', 'Metadata Standards', 'Data Quality Frameworks', 'Open Data'],
+    sampleText: `SDG INDIA NATIONAL INDICATOR FRAMEWORK (NIF) MANUAL
+1. Scope & Mandate: MoSPI is the custodian of the National Indicator Framework (NIF) for monitoring Sustainable Development Goals in India.
+2. Indicator Metadata Standards: Each SDG indicator requires explicit metadata specifying: (a) Target benchmark, (b) Data source agency (MoSPI, Ministry of Health, Ministry of Agriculture, etc.), (c) Formula & unit of measurement, (d) Frequency of reporting, and (e) Disaggregation levels (State/UT, Rural/Urban, Gender).
+3. Data Validation & Quality Audit: Data received from line ministries must undergo automated consistency checks against historical baselines before publication on the National SDG Dashboard.`,
+    sections: [
+      {
+        id: 'sdg-sec-1',
+        title: 'Section 1: Structure of National Indicator Framework',
+        content: 'Mapping of 17 SDGs to national priority schemes and custodian division responsibilities.'
+      },
+      {
+        id: 'sdg-sec-2',
+        title: 'Section 2: Metadata Compilation and API Data Exchange',
+        content: 'API specifications for automated ingestion of state-level SDG microdata.'
+      }
+    ]
+  },
+  {
     id: 'data-qa-manual',
     title: 'NSSO Data Quality Assurance Manual V3: Scrutiny Rules & Validation Protocols',
     code: 'NSSO-QA-V3',
@@ -165,10 +224,12 @@ export const OFFICIAL_MANUALS: OfficialManual[] = [
 ];
 
 export const INITIAL_COMPETENCIES: CompetencyDomain[] = [
+  // --- Pillar 1: Statistical Competencies ---
   {
     id: 'survey-sampling',
-    name: 'Survey Sampling Methodology',
+    name: 'Survey Design & Sampling Methodology',
     shortName: 'Survey Sampling',
+    pillar: 'Statistical',
     currentLevel: 3,
     targetLevel: 5,
     peerBenchmark: 3.5,
@@ -176,29 +237,95 @@ export const INITIAL_COMPETENCIES: CompetencyDomain[] = [
     status: 'Developing',
     skills: [
       { name: 'Multi-stage Stratified Sampling', status: 'Proficient', iGotCourseId: 'igot-sample-1' },
-      { name: 'FSU/USU Demarcation Rules', status: 'Proficient' },
-      { name: 'Multipliers and Weight Estimation', status: 'Developing', iGotCourseId: 'igot-sample-2' }
+      { name: 'FSU/USU Demarcation & Hamlet Group Formation', status: 'Proficient' },
+      { name: 'Sampling Weight Estimation & Multipliers', status: 'Developing', iGotCourseId: 'igot-sample-2' }
     ]
   },
   {
     id: 'cpi-iip',
-    name: 'CPI & IIP Index Calculations',
-    shortName: 'CPI/IIP Calc.',
+    name: 'Price Statistics (CPI Base 2012=100 & IIP)',
+    shortName: 'Price Statistics',
+    pillar: 'Statistical',
     currentLevel: 4,
     targetLevel: 5,
     peerBenchmark: 3.8,
     scorePercentage: 80,
     status: 'Proficient',
     skills: [
-      { name: 'Modified Laspeyres Aggregation', status: 'Proficient' },
-      { name: 'Price Relatives & Jevons Index', status: 'Proficient' },
-      { name: 'Seasonal Item Imputation', status: 'Developing', iGotCourseId: 'igot-cpi-1' }
+      { name: 'Modified Laspeyres & Jevons Index Aggregation', status: 'Proficient' },
+      { name: 'Price Relatives & Elementary Aggregates', status: 'Proficient' },
+      { name: 'Seasonal Item Price Imputation', status: 'Developing', iGotCourseId: 'igot-cpi-1' }
+    ]
+  },
+  {
+    id: 'national-acc',
+    name: 'National Accounts Statistics (GVA/NVA & SUT)',
+    shortName: 'National Accounts',
+    pillar: 'Statistical',
+    currentLevel: 4,
+    targetLevel: 5,
+    peerBenchmark: 3.6,
+    scorePercentage: 78,
+    status: 'Proficient',
+    skills: [
+      { name: 'Gross & Net Value Added (GVA/NVA) Compilation', status: 'Proficient' },
+      { name: 'Capital Consumption Depreciation Accounting', status: 'Proficient' },
+      { name: 'Supply-Use Tables (SUT) Balances', status: 'Developing' }
+    ]
+  },
+  {
+    id: 'labour-stats',
+    name: 'Labour Statistics (PLFS Framework)',
+    shortName: 'Labour Statistics',
+    pillar: 'Statistical',
+    currentLevel: 3,
+    targetLevel: 5,
+    peerBenchmark: 3.7,
+    scorePercentage: 68,
+    status: 'Developing',
+    skills: [
+      { name: 'Usual Principal Status (UPSS) Classification', status: 'Proficient' },
+      { name: 'Current Weekly Status (CWS) Criteria', status: 'Developing' },
+      { name: 'LFPR, WPR & Unemployment Rate Formulations', status: 'Developing' }
+    ]
+  },
+  {
+    id: 'agri-ind-stats',
+    name: 'Agricultural & Industrial Statistics (ASI)',
+    shortName: 'Agri & ASI Stats',
+    pillar: 'Statistical',
+    currentLevel: 3,
+    targetLevel: 5,
+    peerBenchmark: 3.9,
+    scorePercentage: 65,
+    status: 'Developing',
+    skills: [
+      { name: 'ASI Factories Act 2m(i)/2m(ii) Frame Scrutiny', status: 'Proficient' },
+      { name: 'Crop Cutting Experiments (CCE) Protocol', status: 'Developing' },
+      { name: 'Census vs Sample Sector Valuation', status: 'Developing' }
+    ]
+  },
+  {
+    id: 'sdg-metadata',
+    name: 'SDG Indicators & Metadata Standards',
+    shortName: 'SDG & Metadata',
+    pillar: 'Statistical',
+    currentLevel: 3,
+    targetLevel: 5,
+    peerBenchmark: 3.4,
+    scorePercentage: 60,
+    status: 'Developing',
+    skills: [
+      { name: 'National Indicator Framework (NIF) Guidelines', status: 'Developing' },
+      { name: 'Data Disaggregation & Target Benchmarking', status: 'Developing' },
+      { name: 'Statistical Metadata Schema Mapping', status: 'Developing' }
     ]
   },
   {
     id: 'data-val',
-    name: 'Data Validation & Cleaning',
+    name: 'Data Quality Frameworks & Anomaly Scrutiny',
     shortName: 'Data Validation*',
+    pillar: 'Statistical',
     currentLevel: 2,
     targetLevel: 5,
     peerBenchmark: 3.2,
@@ -210,49 +337,138 @@ export const INITIAL_COMPETENCIES: CompetencyDomain[] = [
       { name: 'Cross-tabulation Consistency Rules', status: 'Developing' }
     ]
   },
-  {
-    id: 'national-acc',
-    name: 'National Accounts Statistics',
-    shortName: 'National Accounts',
-    currentLevel: 4,
-    targetLevel: 5,
-    peerBenchmark: 3.6,
-    scorePercentage: 78,
-    status: 'Proficient',
-    skills: [
-      { name: 'Gross & Net Value Added (GVA/NVA)', status: 'Proficient' },
-      { name: 'Capital Consumption Depreciation', status: 'Proficient' },
-      { name: 'Supply-Use Tables (SUT)', status: 'Developing' }
-    ]
-  },
-  {
-    id: 'field-ops',
-    name: 'Field Operations & Scrutiny',
-    shortName: 'Field Data Collect.',
-    currentLevel: 4,
-    targetLevel: 5,
-    peerBenchmark: 4.1,
-    scorePercentage: 82,
-    status: 'Proficient',
-    skills: [
-      { name: 'Listing Schedule 0.0 Execution', status: 'Proficient' },
-      { name: 'Supervisory Re-interview Audits', status: 'Proficient' },
-      { name: 'Informer Bias Rectification', status: 'Developing' }
-    ]
-  },
+
+  // --- Pillar 2: Technical Competencies ---
   {
     id: 'analytics-prog',
-    name: 'Python/R Analytics for Official Statistics',
+    name: 'Python & R Analytics for Microdata Parsing',
     shortName: 'Python/R Analytics*',
+    pillar: 'Technical',
     currentLevel: 2,
     targetLevel: 5,
     peerBenchmark: 3.0,
     scorePercentage: 38,
     status: 'Critical Gap',
     skills: [
-      { name: 'Pandas DataFrames for Large Datasets', status: 'Critical Gap', iGotCourseId: 'igot-py-1' },
-      { name: 'ggplot2 & Statistical Visualizations', status: 'Developing' },
-      { name: 'Statistical Modelling (lm/glm)', status: 'Critical Gap', iGotCourseId: 'igot-py-2' }
+      { name: 'Pandas & Polars DataFrames for Microdata', status: 'Critical Gap', iGotCourseId: 'igot-py-1' },
+      { name: 'ggplot2 & Statistical Data Visualization', status: 'Developing' },
+      { name: 'Replicate Weight Variance Estimation Algorithms', status: 'Critical Gap', iGotCourseId: 'igot-py-2' }
+    ]
+  },
+  {
+    id: 'db-softwares',
+    name: 'Database & Statistical Packages (SQL, Stata, SPSS, SAS)',
+    shortName: 'SQL / Stata / SPSS',
+    pillar: 'Technical',
+    currentLevel: 3,
+    targetLevel: 5,
+    peerBenchmark: 3.5,
+    scorePercentage: 62,
+    status: 'Developing',
+    skills: [
+      { name: 'SQL Querying on Large Survey Repositories', status: 'Proficient' },
+      { name: 'Stata / SPSS Microdata Syntax Processing', status: 'Developing' },
+      { name: 'SAS Enterprise Guide Workflows', status: 'Developing' }
+    ]
+  },
+  {
+    id: 'gis-spatial',
+    name: 'GIS & Spatial Analytics for Demarcation',
+    shortName: 'GIS & Spatial Stats',
+    pillar: 'Technical',
+    currentLevel: 2,
+    targetLevel: 5,
+    peerBenchmark: 3.1,
+    scorePercentage: 44,
+    status: 'Critical Gap',
+    skills: [
+      { name: 'QGIS / ArcGIS Spatial Frame Demarcation', status: 'Critical Gap' },
+      { name: 'Remote Sensing Satellite Crop Acreage Mapping', status: 'Developing' },
+      { name: 'Geo-tagging Validation of FSUs', status: 'Developing' }
+    ]
+  },
+  {
+    id: 'ai-open-data',
+    name: 'AI/ML, Cloud Computing & Open Data APIs',
+    shortName: 'AI/ML & APIs',
+    pillar: 'Technical',
+    currentLevel: 2,
+    targetLevel: 5,
+    peerBenchmark: 2.8,
+    scorePercentage: 35,
+    status: 'Critical Gap',
+    skills: [
+      { name: 'LLM & NLP Prompt Engineering for Scrutiny', status: 'Critical Gap' },
+      { name: 'Rest API Integration with MoSPI Portals', status: 'Developing' },
+      { name: 'Cloud Architecture & Open Data Standards', status: 'Critical Gap' }
+    ]
+  },
+
+  // --- Pillar 3: Digital Governance ---
+  {
+    id: 'cyber-privacy',
+    name: 'Data Privacy, Anonymization & DPDP Act Compliance',
+    shortName: 'Data Privacy & Cyber',
+    pillar: 'Digital Governance',
+    currentLevel: 3,
+    targetLevel: 5,
+    peerBenchmark: 3.6,
+    scorePercentage: 65,
+    status: 'Developing',
+    skills: [
+      { name: 'DPDP Act 2023 Principles for Survey Microdata', status: 'Developing' },
+      { name: 'Microdata Anonymization (k-anonymity)', status: 'Developing' },
+      { name: 'Government Information Security Guidelines', status: 'Proficient' }
+    ]
+  },
+  {
+    id: 'dpi-cloud',
+    name: 'Government Cloud (MeghRaj), DPI & Digital Signatures',
+    shortName: 'DPI & Gov Cloud',
+    pillar: 'Digital Governance',
+    currentLevel: 4,
+    targetLevel: 5,
+    peerBenchmark: 3.9,
+    scorePercentage: 78,
+    status: 'Proficient',
+    skills: [
+      { name: 'MeghRaj Government Cloud Hosting Norms', status: 'Proficient' },
+      { name: 'Digital Signatures & e-Office Integration', status: 'Proficient' },
+      { name: 'Digital Public Infrastructure (DPI) API Standards', status: 'Developing' }
+    ]
+  },
+
+  // --- Pillar 4: Behavioural and Managerial Competencies ---
+  {
+    id: 'leadership-proj',
+    name: 'Leadership & Survey Project Management',
+    shortName: 'Leadership & PM',
+    pillar: 'Behavioural & Managerial',
+    currentLevel: 4,
+    targetLevel: 5,
+    peerBenchmark: 4.0,
+    scorePercentage: 82,
+    status: 'Proficient',
+    skills: [
+      { name: 'Field Survey Team Coordination & Leadership', status: 'Proficient' },
+      { name: 'Survey Time Schedule & Budget Management', status: 'Proficient' },
+      { name: 'Change Management in Statistical Digital Transformation', status: 'Developing' }
+    ]
+  },
+  {
+    id: 'comm-policy',
+    name: 'Communication, Decision Making & Statistical Ethics',
+    shortName: 'Communication & Ethics',
+    pillar: 'Behavioural & Managerial',
+    currentLevel: 4,
+    targetLevel: 5,
+    peerBenchmark: 4.1,
+    scorePercentage: 84,
+    status: 'Proficient',
+    skills: [
+      { name: 'Evidence-Based Policy Support & Briefing', status: 'Proficient' },
+      { name: 'Statistical Ethics & Integrity Guidelines', status: 'Proficient' },
+      { name: 'Data Storytelling & Executive Presentation', status: 'Proficient' }
     ]
   }
 ];
@@ -590,5 +806,92 @@ export const VIVA_TOPICS: { id: string; title: string; manual: string; descripti
     description: 'Explanation of Census vs Sample sector demarcation, Net Value Added (NVA) accounting, and factory schedule audit.',
     targetRole: 'Supervising Officer (DPD/FOD)',
   },
+];
+
+export const NSSTA_TPAC_PROGRAMS: NSSTATPACProgram[] = [
+  {
+    id: 'tpac-2024-01',
+    title: 'Advanced In-Service Training on System of National Accounts (SNA 2008) & SUT',
+    tpacCode: 'NSSTA-TPAC-SNA-01',
+    category: 'In-Service',
+    duration: '5 Days (30 Hours)',
+    mode: 'Residential (NSSTA Greater Noida)',
+    targetCadre: 'ISS Officers (JTS/STS/JAG)',
+    matchScore: 94,
+    competency: 'National Accounts Statistics',
+    description: 'TPAC-recommended intensive module covering GVA, Input-Output Tables, Supply-Use Tables, and corporate sector MCA21 integration.',
+    upcomingBatchDate: '15 Sep 2026',
+    seatsAvailable: 12,
+    nominationStatus: 'Open',
+    syllabus: [
+      'Module 1: Sequence of Accounts & Rest of the World Account',
+      'Module 2: Compilation of Gross Value Added from Corporate Records',
+      'Module 3: Supply-Use Tables (SUT) Balances & Deflator Matrices',
+      'Module 4: Practical Lab on National Accounts Workshop Software'
+    ]
+  },
+  {
+    id: 'tpac-2024-02',
+    title: 'National Workshop on AI/ML & Big Data Analytics in Official Statistics',
+    tpacCode: 'NSSTA-TPAC-AIML-02',
+    category: 'Specialized Workshop',
+    duration: '3 Days (18 Hours)',
+    mode: 'Hybrid / Online',
+    targetCadre: 'ISS & SSS Officers',
+    matchScore: 98,
+    competency: 'AI/ML & Open Data APIs',
+    description: 'High-priority TPAC programme focusing on applying LLMs, automated survey audit algorithms, and Python ML pipelines to MoSPI datasets.',
+    upcomingBatchDate: '22 Oct 2026',
+    seatsAvailable: 45,
+    nominationStatus: 'Nominated',
+    syllabus: [
+      'Module 1: Automated Outlier & Anomaly Detection with Machine Learning',
+      'Module 2: Natural Language Processing for Industrial Survey Text Categorization',
+      'Module 3: API Integration with iGOT & MoSPI Open Data Portals',
+      'Module 4: Hands-on Lab: LLM-driven Quiz & Assessment Engine'
+    ]
+  },
+  {
+    id: 'tpac-2024-03',
+    title: 'Training Programme on Agricultural Statistics & Remote Sensing Crop Estimation',
+    tpacCode: 'NSSTA-TPAC-AGRI-03',
+    category: 'In-Service',
+    duration: '4 Days (24 Hours)',
+    mode: 'Residential (NSSTA Greater Noida)',
+    targetCadre: 'State DES & SSS Field Directors',
+    matchScore: 89,
+    competency: 'Agricultural Statistics',
+    description: 'TPAC sanctioned training on crop area estimation, yield statistics, land use classification, and satellite image integration.',
+    upcomingBatchDate: '10 Nov 2026',
+    seatsAvailable: 20,
+    nominationStatus: 'Open',
+    syllabus: [
+      'Module 1: EARAS & GCES Survey Methodology',
+      'Module 2: Crop Cutting Experiments (CCE) Protocol & Digital App Verification',
+      'Module 3: Integration of GIS and Remote Sensing Data for Crop Acreage',
+      'Module 4: Field Data Scrutiny and Crop Yield Variance Modeling'
+    ]
+  },
+  {
+    id: 'tpac-2024-04',
+    title: 'Executive Workshop on Data Governance, DPDP Act 2023 & Cyber Security',
+    tpacCode: 'NSSTA-TPAC-GOV-04',
+    category: 'Executive Leadership',
+    duration: '2 Days (12 Hours)',
+    mode: 'Institutional Workshop',
+    targetCadre: 'Senior Directors & SAG Officers',
+    matchScore: 91,
+    competency: 'Data Privacy & Cyber Security',
+    description: 'Strategic TPAC leadership capsule on compliance with Digital Personal Data Protection Act 2023, government cloud infrastructure, and statistical anonymization standards.',
+    upcomingBatchDate: '05 Dec 2026',
+    seatsAvailable: 15,
+    nominationStatus: 'Open',
+    syllabus: [
+      'Module 1: Legal Framework of DPDP Act 2023 & Official Data Release',
+      'Module 2: Anonymization Standards (k-anonymity & l-diversity) for Microdata',
+      'Module 3: Government Cloud (MeghRaj) & Cyber Security Compliance',
+      'Module 4: Case Studies on Standard Operating Procedures for Data Breaches'
+    ]
+  }
 ];
 
