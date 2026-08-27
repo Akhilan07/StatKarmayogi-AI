@@ -1,6 +1,6 @@
 export type TabType = 'dashboard' | 'competency' | 'igot' | 'generator' | 'analytics' | 'viva';
 
-export type AppLanguage = 'en' | 'hi' | 'ta';
+export type AppLanguage = 'en' | 'hi' | 'ta' | 'te' | 'ml' | 'kn';
 
 export type DifficultyLevel = 'Beginner' | 'Intermediate' | 'Advanced';
 

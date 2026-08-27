@@ -7,6 +7,9 @@ const LANGUAGE_LABELS: Record<LanguageCode, { native: string; english: string }>
   en: { native: 'English', english: 'English' },
   hi: { native: 'हिंदी', english: 'Hindi' },
   ta: { native: 'தமிழ்', english: 'Tamil' },
+  te: { native: 'తెలుగు', english: 'Telugu' },
+  ml: { native: 'മലയാളം', english: 'Malayalam' },
+  kn: { native: 'ಕನ್ನಡ', english: 'Kannada' },
 };
 
 export const LanguageConfirmModal: React.FC = () => {

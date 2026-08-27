@@ -14,6 +14,7 @@ import {
 import { StatKarmayogiLogo } from './StatKarmayogiLogo';
 import { OfficerProfile } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { LanguageConfirmModal } from './LanguageConfirmModal';
 
 interface LandingLoginPageProps {
   onLoginSuccess: (profile: OfficerProfile) => void;
@@ -116,6 +117,9 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({ onLoginSucce
     { code: 'en', label: 'English', native: 'English' },
     { code: 'hi', label: 'Hindi', native: 'हिंदी' },
     { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
+    { code: 'te', label: 'Telugu', native: 'తెలుగు' },
+    { code: 'ml', label: 'Malayalam', native: 'മലയാളം' },
+    { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' },
   ];
 
   return (
@@ -358,6 +362,7 @@ export const LandingLoginPage: React.FC<LandingLoginPageProps> = ({ onLoginSucce
           </div>
         </div>
       </footer>
+      <LanguageConfirmModal />
     </div>
   );
 };

@@ -1,7 +1,6 @@
-export type LanguageCode = 'en' | 'hi' | 'ta';
+export type LanguageCode = 'en' | 'hi' | 'ta' | 'te' | 'ml' | 'kn';
 
 export interface TranslationDictionary {
-  // Navigation
   nav_dashboard: string;
   nav_competency: string;
   nav_igot: string;
@@ -471,5 +470,87 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     export_telemetry: "செயல்பாட்டு தரவு CSV ஏற்றுமதி",
     division_metrics: "பிரிவு வாரியான தயார்நிலை",
     workforce_readiness: "பணியாளர் திறன் விநியோகம்",
-  }
+  },
+  te: {} as any,
+  ml: {} as any,
+  kn: {} as any
+};
+
+// Post-initialize Telugu, Malayalam, and Kannada translations to reuse English default keys
+TRANSLATIONS.te = {
+  ...TRANSLATIONS.en,
+  lang_switch_title: "భాషను మార్చండి (Switch Language)",
+  lang_confirm_question: "ఇంటర్‌ఫేస్ భాషను {lang} కి మార్చాలనుకుంటున్నారా?",
+  confirm: "ధృవీకరించు",
+  cancel: "రద్దు చేయి",
+  language: "భాష",
+  current_language: "తెలుగు",
+  landing_hero_title: "MoSPI స్టాట్‌కర్మయోగి పోర్టల్",
+  landing_hero_subtitle: "భారతదేశ అధికారిక గణాంక వ్యవస్థ కోసం AI-ఆధారిత సామర్థ్య అంచనా & iGOT కర్మయోగి అభ్యాస పర్యావరణ వ్యవస్థ",
+  landing_sso_title: "అధికారి సింగిల్ సైన్-ఆన్ (SSO)",
+  landing_sso_subtitle: "iGOT కర్మయోగి సివిల్ సర్వీసెస్ ఆధారాల ద్వారా లాగిన్ అవ్వండి లేదా డెమో ప్రొఫైల్‌ను ఎంచుకోండి",
+  landing_select_officer: "డెమో అధికారి ప్రొఫైల్‌ను ఎంచుకోండి",
+  landing_enter_custom: "కస్టమ్ కర్మయోగి ఆధారాలను నమోదు చేయండి",
+  landing_sign_in_btn: "ధృవీకరించండి & వర్క్‌స్పేస్‌లోకి ప్రవేశించండి",
+  nav_dashboard: "డాష్‌బోర్డ్",
+  nav_competency: "సామర్థ్య విశ్లేషణ",
+  nav_igot: "iGOT లెర్నింగ్ పాత్",
+  nav_generator: "క్విజ్ & MCQ జనరేటర్",
+  nav_analytics: "విశ్లేషణలు & నివేదికలు",
+  nav_viva: "AI మౌఖిక వివా",
+  status_proficient: "నైపుణ్యం గల",
+  status_critical_gap: "తీవ్రమైన లోటు",
+  status_moderate_gap: "మితమైన అంతరం"
+};
+
+TRANSLATIONS.ml = {
+  ...TRANSLATIONS.en,
+  lang_switch_title: "ഭാഷ മാറ്റുക (Switch Language)",
+  lang_confirm_question: "ഇന്റർഫേസ് ഭാഷ {lang} ലേക്ക് മാറ്റാൻ നിങ്ങൾ ആഗ്രഹിക്കുന്നുണ്ടോ?",
+  confirm: "സ്ഥിരീകരിക്കുക",
+  cancel: "റദ്ദാക്കുക",
+  language: "ഭാഷ",
+  current_language: "മലയാളം",
+  landing_hero_title: "MoSPI സ്റ്റാറ്റ്കർമ്മയോഗി പോർട്ടൽ",
+  landing_hero_subtitle: "ഇന്ത്യയുടെ ഔദ്യോഗിക സ്റ്റാറ്റിസ്റ്റിക്കൽ സിസ്റ്റത്തിനായി AI-അധിഷ്ഠിത ശേഷി വിലയിരുത്തലും iGOT കർമ്മയോഗി ലേണിംഗ് ഇക്കോസിസ്റ്റവും",
+  landing_sso_title: "ഓഫീസർ സിംഗിൾ സൈൻ-ഓൺ (SSO)",
+  landing_sso_subtitle: "iGOT കർമ്മയോഗി സിവിൽ സർവീസസ് ക്രെഡൻഷ്യലുകൾ വഴി ലോഗിൻ ചെയ്യുക അല്ലെങ്കിൽ ഡെമോ പ്രൊഫൈൽ തിരഞ്ഞെടുക്കുക",
+  landing_select_officer: "ಡೆಮೊ ഓഫീಸರ್ ಪ್ರೊಫೈಲ್ തിരഞ്ഞെടുക്കുക",
+  landing_enter_custom: "ഇഷ്ടാനുസൃത കർമ്മയോഗി ക്രെഡൻഷ്യലുകൾ നൽകുക",
+  landing_sign_in_btn: "സ്ഥിരീകരിച്ച് വർക്ക്സ്പേസിൽ പ്രവേശിക്കുക",
+  nav_dashboard: "ഡാഷ്‌ബോർഡ്",
+  nav_competency: "ശേഷി വിശകലനം",
+  nav_igot: "iGOT ലೇണിംഗ് പാത്ത്",
+  nav_generator: "ക്വിസ് & MCQ ജനറേറ്റർ",
+  nav_analytics: "അനലിറ്റിക്സും റിപ്പോർട്ടുകളും",
+  nav_viva: "AI വോയ്‌း വിവാ",
+  status_proficient: "ಪ್ರವೀಣ್",
+  status_critical_gap: "ഗുരുതരമായ കുറവ്",
+  status_moderate_gap: "മിതമായ വ്യത്യാസം"
+};
+
+TRANSLATIONS.kn = {
+  ...TRANSLATIONS.en,
+  lang_switch_title: "ಭಾಷೆಯನ್ನು ಬದಲಾಯಿಸಿ (Switch Language)",
+  lang_confirm_question: "ಇಂಟರ್ಫೇಸ್ ಭಾಷೆಯನ್ನು {lang} ಗೆ ಬದಲಾಯಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?",
+  confirm: "ಖಚಿತಪಡಿಸಿ",
+  cancel: "ರದ್ದುಮಾಡಿ",
+  language: "ಭಾಷೆ",
+  current_language: "ಕನ್ನಡ",
+  landing_hero_title: "MoSPI ಸ್ಟಾಟ್‌ಕರ್ಮಯೋಗಿ ಪೋರ್ಟಲ್",
+  landing_hero_subtitle: "ಭಾರತದ ಅಧಿಕೃತ ಸಾಂಖ್ಯಿಕ ವ್ಯವಸ್ಥೆಗಾಗಿ AI-ಚಾಲಿತ ಸಾಮರ್ಥ್ಯ ಮೌಲ್ಯಮಾಪನ ಮತ್ತು iGOT ಕರ್ಮಯೋಗಿ ಕಲಿಕಾ ಪರಿಸರ ವ್ಯವಸ್ಥೆ",
+  landing_sso_title: "ಅಧಿಕಾರಿ ಸಿಂಗಲ್ ಸೈನ್-ಆನ್ (SSO)",
+  landing_sso_subtitle: "iGOT ಕರ್ಮಯೋಗಿ ನಾಗರಿಕ ಸೇವೆಗಳ ರುಜುವಾತುಗಳ ಮೂಲಕ ಲಾಗ್ ಇನ್ ಮಾಡಿ ಅಥವಾ ಡೆಮೋ ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ",
+  landing_select_officer: "ಡೆಮೋ ಅಧಿಕಾರಿ ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ",
+  landing_enter_custom: "ಕಸ್ಟಮ್ ಕರ್ಮಯೋಗಿ ರುಜುವಾತುಗಳನ್ನು ನಮೂದಿಸಿ",
+  landing_sign_in_btn: "ದೃಢೀಕರಿಸಿ ಮತ್ತು ವರ್ಕ್‌ಸ್ಪೇಸ್‌ಗೆ ಪ್ರವೇಶಿಸಿ",
+  nav_dashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+  nav_competency: "ಸಾಮರ್ಥ್ಯ ವಿಶ್ಲೇಷಣೆ",
+  nav_igot: "iGOT ಕಲಿಕಾ ಮಾರ್ಗ",
+  nav_generator: "ಕ್ವಿಜ್ ಮತ್ತು MCQ ಜನರೇಟರ್",
+  nav_analytics: "ವಿಶ್ಲೇಷಣೆ ಮತ್ತು ವರದಿಗಳು",
+  nav_viva: "AI ಮೌಖಿಕ ಪರೀಕ್ಷೆ",
+  status_proficient: "ಪರಿಣಿತ",
+  status_critical_gap: "ಗಂಭೀರ ಕೊರತೆ",
+  status_moderate_gap: "ಮಧ್ಯಮ ಅಂತರ"
 };

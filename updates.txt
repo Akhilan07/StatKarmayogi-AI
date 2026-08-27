@@ -206,3 +206,12 @@ Briefing:
 - Resolved Circular Import Deadlock: Replaced the recursive import App from '../../src/App' inside AppVariantD.tsx with a clean standalone SIH evaluation wrapper (DashboardView, LanguageProvider, ToastProvider, SihJuryOverviewModal).
 - Verified Crash-Free Variant Switching: Tested switching across all 5 build variants (Primary, Variant A, Variant B, Variant C, Variant D) with zero module loading errors or call stack overflow crashes.
 - Verified Zero Build Errors: Confirmed clean compilation with npx tsc --noEmit and successful production distribution build with npx vite build.
+
+Update #29 - Aug 27, 2026 [10:10 IST]
+Name: Landing Page Language Switcher Fix & Deep South Indian Multilingual Expansion (Telugu, Malayalam, Kannada)
+Briefing:
+- Landing Page Switcher Fix: Mounted LanguageConfirmModal inside LandingLoginPage.tsx, resolving the login-state rendering block and enabling instant language switching from the SSO portal.
+- South Indian Language Integration: Added support for Telugu (te), Malayalam (ml), and Kannada (kn) to AppLanguage (types.ts), LanguageCode (translations.ts), and LanguageProvider (LanguageContext.tsx).
+- Native Translation Dictionary Expansion: Set up dynamic post-initialization overrides mapping core dashboard tabs, features, buttons, and SSO labels to verified Telugu, Malayalam, and Kannada scripts.
+- Dropdown Selector Synchronization: Updated options in TopNavBar.tsx and LandingLoginPage.tsx to render all 6 supported languages.
+- Compilation & Build Verification: Passed 100% clean type-checking (npx tsc --noEmit) and successful production Vite bundler execution (npm run build).

@@ -18,7 +18,7 @@ const STORAGE_KEY = 'statkarmayogi_language';
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<LanguageCode>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === 'hi' || saved === 'ta' || saved === 'en') {
+    if (saved === 'hi' || saved === 'ta' || saved === 'en' || saved === 'te' || saved === 'ml' || saved === 'kn') {
       return saved as LanguageCode;
     }
     return 'en';

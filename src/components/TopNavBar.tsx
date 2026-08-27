@@ -138,6 +138,9 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
     { code: 'en' as AppLanguage, label: 'English', badge: 'EN' },
     { code: 'hi' as AppLanguage, label: 'हिंदी', badge: 'HI' },
     { code: 'ta' as AppLanguage, label: 'தமிழ்', badge: 'TA' },
+    { code: 'te' as AppLanguage, label: 'తెలుగు', badge: 'TE' },
+    { code: 'ml' as AppLanguage, label: 'മലയാളം', badge: 'ML' },
+    { code: 'kn' as AppLanguage, label: 'ಕನ್ನಡ', badge: 'KN' },
   ];
 
   const currentOption = languageOptions.find((l) => l.code === language) || languageOptions[0];
