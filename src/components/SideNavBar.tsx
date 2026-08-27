@@ -7,13 +7,12 @@ import {
   LineChart, 
   Play, 
   Settings, 
-  LogOut,
-  Sparkles,
   Award,
   Mic
 } from 'lucide-react';
 import { AppLanguage, OfficerProfile, TabType } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { StatKarmayogiLogo } from './StatKarmayogiLogo';
 
 interface SideNavBarProps {
   activeTab: TabType;
@@ -23,7 +22,7 @@ interface SideNavBarProps {
   setIsMobileOpen?: (open: boolean) => void;
   language?: AppLanguage;
   user?: OfficerProfile;
-  onOpenLogin?: () => void;
+  onOpenSettings?: () => void;
 }
 
 export const SideNavBar: React.FC<SideNavBarProps> = ({
@@ -32,8 +31,7 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
   onStartTraining,
   isMobileOpen = false,
   setIsMobileOpen,
-  user,
-  onOpenLogin,
+  onOpenSettings,
 }) => {
   const { t, language } = useLanguage();
   const isHindi = language === 'hi';
@@ -69,43 +67,30 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
       {isMobileOpen && (
         <div 
           id="mobile-nav-backdrop"
-          className="fixed inset-0 bg-slate-900/60 z-40 md:hidden backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 bg-slate-950/80 z-40 md:hidden backdrop-blur-md transition-opacity"
           onClick={() => setIsMobileOpen?.(false)}
         />
       )}
 
       <aside className={`
-        fixed left-0 top-0 h-full w-[280px] bg-[#f0ede6]/95 backdrop-blur-xl border-r border-[#e4ded2] 
-        shadow-[0_4px_20px_rgba(28,27,24,0.04)] z-50 flex flex-col py-7 px-5 transition-transform duration-300 ease-in-out
+        fixed left-0 top-0 h-full w-[280px] bg-[#0f172a] text-slate-100 backdrop-blur-2xl border-r border-slate-800/80
+        shadow-[4px_0_24px_rgba(0,0,0,0.3)] z-50 flex flex-col py-6 px-4 transition-transform duration-300 ease-in-out
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         {/* Brand & Logo */}
-        <div className="flex flex-col items-start gap-3 mb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0f172a] flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-500/30">
-              <Sparkles className="w-5 h-5 text-emerald-400" />
-            </div>
-            <div>
-              <h1 className="text-lg font-extrabold text-slate-900 tracking-tight leading-tight flex items-center gap-1.5">
-                StatKarmayogi <span className="text-emerald-800 font-extrabold text-[10px] px-1.5 py-0.5 bg-emerald-100 rounded border border-emerald-200">AI</span>
-              </h1>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                {isTamil ? 'MoSPI போர்டல்' : isHindi ? 'मोस्पी पोर्टल' : 'MoSPI Enterprise Portal'}
-              </p>
-            </div>
-          </div>
-
-          <div className="w-full h-px bg-slate-200/70 my-1" />
+        <div className="flex flex-col items-start gap-3 mb-5 px-1">
+          <StatKarmayogiLogo size="md" variant="dark" />
+          <div className="w-full h-px bg-slate-800/80 my-0.5" />
         </div>
 
         {/* CTA Button */}
-        <div className="mb-5">
+        <div className="mb-5 px-1">
           <button 
             id="start-training-sidebar-btn"
             onClick={onStartTraining}
-            className="w-full py-2.5 px-4 bg-[#0f172a] text-white rounded-xl font-bold text-xs hover:bg-[#1e293b] transition-all duration-200 shadow-xs hover:shadow flex items-center justify-center gap-2 group border border-slate-800"
+            className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white rounded-xl font-bold text-xs transition-all duration-200 shadow-md hover:shadow-emerald-900/40 flex items-center justify-center gap-2 group border border-emerald-500/30"
           >
-            <Play className="w-3.5 h-3.5 fill-current text-emerald-400 group-hover:scale-110 transition-transform" />
+            <Play className="w-3.5 h-3.5 fill-current text-white group-hover:scale-110 transition-transform" />
             <span>{isTamil ? 'விரைவு நோயறிதலைத் தொடங்கு' : isHindi ? 'त्वरित निदान आरंभ करें' : 'Launch Quick Diagnostic'}</span>
           </button>
         </div>
@@ -114,7 +99,7 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
         <nav className="flex-1 space-y-5 overflow-y-auto pr-1 custom-scrollbar">
           {navSections.map((section, sIdx) => (
             <div key={sIdx} className="space-y-1">
-              <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-3 mb-1.5">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-1.5">
                 {section.title}
               </p>
               {section.items.map((item) => {
@@ -124,22 +109,24 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
                   <button
                     key={item.id}
                     id={`nav-tab-${item.id}`}
+                    aria-label={item.label}
+                    aria-current={isActive ? 'page' : undefined}
                     onClick={() => {
                       setActiveTab(item.id);
                       setIsMobileOpen?.(false);
                     }}
                     className={`
-                      w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-left
+                      w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-left focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#0f172a]
                       ${isActive 
-                        ? 'text-[#006c4a] font-bold bg-[#006c4a]/10 border-l-3 border-[#006c4a] shadow-xs' 
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                        ? 'text-white font-extrabold bg-gradient-to-r from-emerald-950/80 to-slate-900 border-l-4 border-emerald-400 shadow-sm ring-1 ring-emerald-500/20' 
+                        : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                       }
                     `}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#006c4a]' : 'text-slate-400'}`} />
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
                     <span className="truncate flex-1">{item.label}</span>
                     {item.badge && (
-                      <span className="px-1.5 py-0.5 text-[9px] font-extrabold bg-[#006c4a] text-white rounded shadow-xs">
+                      <span className="px-1.5 py-0.5 text-[9px] font-extrabold bg-emerald-500 text-slate-950 rounded shadow-xs">
                         {item.badge}
                       </span>
                     )}
@@ -150,36 +137,28 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
           ))}
         </nav>
 
-        {/* Bottom / Mission Karmayogi Badge & Footer */}
-        <div className="border-t border-slate-200/80 pt-4 mt-auto space-y-2">
-          <div className="p-2.5 rounded-lg bg-white/70 border border-slate-200/60 flex items-center gap-2.5">
-            <Award className="w-5 h-5 text-[#006c4a] shrink-0" />
+        {/* Bottom / Mission Karmayogi Badge & Settings */}
+        <div className="border-t border-slate-800/80 pt-4 mt-auto space-y-2 px-1">
+          <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2.5">
+            <Award className="w-5 h-5 text-emerald-400 shrink-0" />
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-slate-800 uppercase tracking-wide">
+              <p className="text-[11px] font-bold text-slate-200 uppercase tracking-wide">
                 {isTamil ? 'மிஷன் கர்மயோகி' : isHindi ? 'मिशन कर्मयोगी' : 'Mission Karmayogi'}
               </p>
-              <p className="text-[10px] text-slate-500 truncate">
+              <p className="text-[10px] text-emerald-400/90 truncate font-medium">
                 {isTamil ? 'திறன் கட்டமைப்பு சீரமைக்கப்பட்டது' : isHindi ? 'दक्षता ढांचा संरेखित' : 'Competency Framework Aligned'}
               </p>
             </div>
           </div>
 
-          <div className="space-y-0.5 pt-1">
+          <div className="pt-1">
             <button 
               id="sidebar-settings-btn"
-              onClick={() => setActiveTab('analytics')}
-              className="w-full flex items-center gap-3 px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 transition-colors"
+              onClick={onOpenSettings}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/80 border border-slate-800/60 transition-all"
             >
-              <Settings className="w-4 h-4 text-slate-400" />
+              <Settings className="w-4 h-4 text-emerald-400" />
               <span>{isTamil ? 'அமைப்புகள் & கட்டமைப்புகள்' : isHindi ? 'सेटिंग्स एवं ढांचा' : 'Settings & Frameworks'}</span>
-            </button>
-            <button 
-              id="sidebar-logout-btn"
-              onClick={onOpenLogin || (() => alert("Officer session synced with Mission Karmayogi SSO."))}
-              className="w-full flex items-center gap-3 px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
-            >
-              <LogOut className="w-4 h-4 text-slate-400" />
-              <span>{isTamil ? 'அதிகாரியை மாற்று / உள்நுழைவு' : isHindi ? 'अधिकारी बदलें / लॉगिन' : 'Switch Officer / Login'}</span>
             </button>
           </div>
         </div>

@@ -200,7 +200,7 @@ Output strictly valid JSON matching the following structure:
           <button
             onClick={handleRunAiEvaluation}
             disabled={isEvaluating}
-            className="px-3.5 py-2 bg-[#006c4a] hover:bg-[#005137] text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-75"
+            className="px-3.5 py-2 bg-[#0f2942] hover:bg-[#081a2b] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-75"
           >
             <Sparkles className={`w-3.5 h-3.5 text-[#82f5c1] ${isEvaluating ? 'animate-spin' : ''}`} />
             <span>{isEvaluating ? 'Evaluating MoSPI Gaps...' : 'Run Live AI Gap Analysis'}</span>
@@ -213,7 +213,7 @@ Output strictly valid JSON matching the following structure:
         {/* Left Column: Domain Mastery + Skill Matrix (Span 8) */}
         <section className="xl:col-span-8 flex flex-col gap-6">
           {/* 1. Domain Mastery Assessment */}
-          <div className="glass-panel rounded-2xl p-6 shadow-sm">
+          <div className="glass-panel rounded-2xl p-6 shadow-xs">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
               <div>
                 <h3 className="text-lg font-bold text-slate-900">Official Competency Benchmark</h3>
@@ -221,15 +221,15 @@ Output strictly valid JSON matching the following structure:
               </div>
               <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-[#006c4a] rounded-sm" />
+                  <div className="w-3 h-3 bg-[#0f2942] rounded-xs" />
                   <span>Officer Score</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 bg-[#82f5c1] rounded-sm" />
+                  <div className="w-3 h-3 bg-slate-300 rounded-xs" />
                   <span>Benchmark</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 border border-dashed border-slate-500 rounded-sm" />
+                  <div className="w-3 h-3 border border-dashed border-slate-500 rounded-xs" />
                   <span>Target 100%</span>
                 </div>
               </div>
@@ -243,7 +243,7 @@ Output strictly valid JSON matching the following structure:
                   onClick={() => setSelectedPillar(p)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     selectedPillar === p
-                      ? 'bg-[#006c4a] text-white shadow-sm'
+                      ? 'bg-[#0f2942] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -275,15 +275,15 @@ Output strictly valid JSON matching the following structure:
                         <span>{getTranslatedCompetencyTitle(comp.competency, t)}</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                           isCritical
-                            ? 'bg-red-100 text-red-800 border border-red-200'
+                            ? 'bg-rose-50 text-rose-800 border border-rose-200'
                             : isGap
-                            ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                            : 'bg-emerald-100 text-[#006c4a] border border-emerald-200'
+                            ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                            : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                         }`}>
                           {getTranslatedStatus(comp.status, t)}
                         </span>
                       </span>
-                      <span className={isCritical ? 'text-red-700 font-bold' : isGap ? 'text-amber-700 font-bold' : 'text-[#006c4a] font-bold'}>
+                      <span className={isCritical ? 'text-rose-700 font-bold' : isGap ? 'text-amber-700 font-bold' : 'text-[#0f2942] font-bold'}>
                         {comp.score}% (Benchmark: {comp.benchmark}%)
                       </span>
                     </div>
@@ -298,14 +298,14 @@ Output strictly valid JSON matching the following structure:
                       />
                       {/* Peer Benchmark Layer */}
                       <div 
-                        className="absolute left-0 top-0 h-full bg-[#82f5c1] z-0 rounded-l-full"
+                        className="absolute left-0 top-0 h-full bg-slate-300 z-0 rounded-l-full"
                         style={{ width: `${benchPct}%` }}
                         title={`Benchmark: ${benchPct}%`}
                       />
                       {/* Current Level Layer */}
                       <div 
-                        className={`absolute left-0 top-0 h-full z-10 rounded-full transition-all duration-700 shadow-sm ${
-                          isCritical ? 'bg-red-600' : isGap ? 'bg-amber-600' : 'bg-[#006c4a]'
+                        className={`absolute left-0 top-0 h-full z-10 rounded-full transition-all duration-700 shadow-xs ${
+                          isCritical ? 'bg-rose-600' : isGap ? 'bg-amber-600' : 'bg-[#0f2942]'
                         }`}
                         style={{ width: `${scorePct}%` }}
                         title={`Officer Score: ${scorePct}%`}

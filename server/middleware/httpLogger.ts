@@ -3,7 +3,7 @@ import { logger } from '../logging/logger';
 
 /**
  * Express HTTP Request Telemetry & Access Logging Middleware
- * Logs method, URL, execution duration, status code, and IP address while masking sensitive parameters.
+ * Logs method, URL, execution duration, status code, request ID, and IP address.
  */
 export const httpLoggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const startTime = Date.now();
@@ -14,6 +14,7 @@ export const httpLoggerMiddleware = (req: Request, res: Response, next: NextFunc
 
     const logData = {
       category: 'HTTP_ACCESS',
+      requestId: req.requestId,
       method: req.method,
       url: req.originalUrl || req.url,
       statusCode,
@@ -23,11 +24,11 @@ export const httpLoggerMiddleware = (req: Request, res: Response, next: NextFunc
     };
 
     if (statusCode >= 500) {
-      logger.error(`[HTTP ${statusCode}] ${req.method} ${req.originalUrl} (${durationMs}ms)`, logData);
+      logger.error(`[HTTP ${statusCode}] ${req.method} ${req.originalUrl} (${durationMs}ms) [${req.requestId}]`, logData);
     } else if (statusCode >= 400) {
-      logger.warn(`[HTTP ${statusCode}] ${req.method} ${req.originalUrl} (${durationMs}ms)`, logData);
+      logger.warn(`[HTTP ${statusCode}] ${req.method} ${req.originalUrl} (${durationMs}ms) [${req.requestId}]`, logData);
     } else {
-      logger.info(`[HTTP ${statusCode}] ${req.method} ${req.originalUrl} (${durationMs}ms)`, logData);
+      logger.info(`[HTTP ${statusCode}] ${req.method} ${req.originalUrl} (${durationMs}ms) [${req.requestId}]`, logData);
     }
   });
 

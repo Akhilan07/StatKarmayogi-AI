@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodSchema } from 'zod';
 
 interface ValidationTargets {
   body?: ZodSchema<any>;
@@ -81,3 +81,8 @@ export const validateRequest = (targets: ValidationTargets) => {
     }
   };
 };
+
+/**
+ * Convenience helper to validate request body
+ */
+export const validateBody = (schema: ZodSchema<any>) => validateRequest({ body: schema });

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, ShieldCheck, Zap, BookOpen, ChevronUp, ChevronDown, Check } from 'lucide-react';
+import { Layers, ShieldCheck, Zap, BookOpen, ChevronUp, ChevronDown, Check, Trophy } from 'lucide-react';
 
-export type AppVariant = 'primary' | 'admin' | 'gamified' | 'rag';
+export type AppVariant = 'primary' | 'admin' | 'gamified' | 'rag' | 'sih';
 
 interface DevVariantSwitcherProps {
   currentVariant: AppVariant;
@@ -12,6 +12,13 @@ export const DevVariantSwitcher: React.FC<DevVariantSwitcherProps> = ({
   currentVariant,
   onSelectVariant,
 }) => {
+  const flag = (import.meta as any).env?.VITE_SHOW_VARIANT_SWITCHER;
+  const isDev = (import.meta as any).env?.DEV;
+  const showSwitcher = flag === 'true' || (isDev && flag !== 'false');
+  if (!showSwitcher) {
+    return null;
+  }
+
   const [isOpen, setIsOpen] = useState(false);
 
   const variants = [
@@ -29,7 +36,7 @@ export const DevVariantSwitcher: React.FC<DevVariantSwitcherProps> = ({
       tag: 'Leadership & Heatmaps',
       desc: 'Ministry/DIID view with expanded heatmaps & division deficit tracking',
       icon: Layers,
-      color: 'bg-indigo-500',
+      color: 'bg-[#0f2942]',
     },
     {
       id: 'gamified' as AppVariant,
@@ -37,7 +44,7 @@ export const DevVariantSwitcher: React.FC<DevVariantSwitcherProps> = ({
       tag: 'Quizzes & Badges',
       desc: 'Interactive officer experience with streaks, micro-quizzes & XP',
       icon: Zap,
-      color: 'bg-amber-500',
+      color: 'bg-amber-600',
     },
     {
       id: 'rag' as AppVariant,
@@ -45,7 +52,15 @@ export const DevVariantSwitcher: React.FC<DevVariantSwitcherProps> = ({
       tag: 'Split-screen RAG',
       desc: 'Split-screen PDF manual viewer & real-time live MCQ generator',
       icon: BookOpen,
-      color: 'bg-cyan-500',
+      color: 'bg-teal-600',
+    },
+    {
+      id: 'sih' as AppVariant,
+      name: 'Variant D: SIH Jury Edition',
+      tag: 'Grand Finale & Telemetry',
+      desc: 'Smart India Hackathon 2026 presentation deck, telemetry & evaluation modal',
+      icon: Trophy,
+      color: 'bg-amber-500',
     },
   ];
 

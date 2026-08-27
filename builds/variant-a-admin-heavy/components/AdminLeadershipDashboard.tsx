@@ -33,7 +33,7 @@ export const AdminLeadershipDashboard: React.FC = () => {
       <div className="bg-[#0b1329] text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="bg-slate-800 text-emerald-400 border border-slate-700 text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
               Variant A: Ministry / DIID Leadership View
             </span>
             <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
@@ -50,9 +50,9 @@ export const AdminLeadershipDashboard: React.FC = () => {
 
         <button
           onClick={handleExportReport}
-          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 shrink-0 border border-indigo-400/30"
+          className="px-4 py-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 shrink-0 border border-slate-700"
         >
-          <Download className="w-4 h-4" />
+          <Download className="w-4 h-4 text-emerald-400" />
           <span>Export DIID Executive Summary</span>
         </button>
       </div>
@@ -73,7 +73,7 @@ export const AdminLeadershipDashboard: React.FC = () => {
         <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-2">
           <div className="flex justify-between items-center text-slate-500 text-xs font-semibold">
             <span>Officers Tracked</span>
-            <Users className="w-4 h-4 text-indigo-600" />
+            <Users className="w-4 h-4 text-[#0f2942]" />
           </div>
           <p className="text-3xl font-black text-slate-900">{DIID_LEADERSHIP_STATS.totalOfficersTracked}</p>
           <p className="text-[11px] text-slate-500 font-medium">ISS &amp; SSS Cadres</p>
@@ -107,7 +107,7 @@ export const AdminLeadershipDashboard: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-100">
           <div>
             <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-indigo-600" />
+              <Layers className="w-5 h-5 text-[#0f2942]" />
               <span>Departmental Competency Deficit Matrix</span>
             </h3>
             <p className="text-xs text-slate-500">Breakdown across the 4 Core Competency Pillars</p>
@@ -173,7 +173,7 @@ export const AdminLeadershipDashboard: React.FC = () => {
                   <span className="text-slate-900 font-bold">{dept.pillars.statistical}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-slate-200/80 rounded-full overflow-hidden">
-                  <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${dept.pillars.statistical}%` }} />
+                  <div className="h-full bg-[#0f2942] rounded-full" style={{ width: `${dept.pillars.statistical}%` }} />
                 </div>
 
                 <div className="flex justify-between text-[11px] font-semibold pt-1">
@@ -181,7 +181,7 @@ export const AdminLeadershipDashboard: React.FC = () => {
                   <span className="text-slate-900 font-bold">{dept.pillars.technical}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-slate-200/80 rounded-full overflow-hidden">
-                  <div className="h-full bg-amber-600 rounded-full" style={{ width: `${dept.pillars.technical}%` }} />
+                  <div className="h-full bg-emerald-600 rounded-full" style={{ width: `${dept.pillars.technical}%` }} />
                 </div>
               </div>
 

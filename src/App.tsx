@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { SideNavBar } from './components/SideNavBar';
 import { TopNavBar } from './components/TopNavBar';
 import { DashboardView } from './components/DashboardView';
@@ -12,19 +12,26 @@ import { IGOTLearningPathView } from './components/IGOTLearningPathView';
 import { QuizGeneratorView } from './components/QuizGeneratorView';
 import { AnalyticsReportsView } from './components/AnalyticsReportsView';
 import { VivaExaminerView } from './components/VivaExaminerView';
-import { AssessmentRunnerModal } from './components/AssessmentRunnerModal';
-import { AssessmentReportModal } from './components/AssessmentReportModal';
-import { CertificateModal } from './components/CertificateModal';
 import { LoginModal } from './components/LoginModal';
 import { LanguageConfirmModal } from './components/LanguageConfirmModal';
 import { LandingLoginPage } from './components/LandingLoginPage';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ToastProvider } from './context/ToastContext';
 import { OfflineBanner } from './components/OfflineBanner';
+import { ErrorBoundary } from './components/RetryErrorBoundary';
 import { DevVariantSwitcher, AppVariant } from './components/DevVariantSwitcher';
-import AppVariantA from '../builds/variant-a-admin-heavy/AppVariantA';
-import AppVariantB from '../builds/variant-b-officer-gamified/AppVariantB';
-import AppVariantC from '../builds/variant-c-live-rag-focus/AppVariantC';
+
+// Code Splitting & Dynamic Imports for Ultra-Fast Initial Page Load (<150ms)
+const AppVariantA = lazy(() => import('../builds/variant-a-admin-heavy/AppVariantA'));
+const AppVariantB = lazy(() => import('../builds/variant-b-officer-gamified/AppVariantB'));
+const AppVariantC = lazy(() => import('../builds/variant-c-live-rag-focus/AppVariantC'));
+const AppVariantD = lazy(() => import('../builds/variant-d-sih-jury-edition/AppVariantD'));
+
+const AssessmentRunnerModal = lazy(() => import('./components/AssessmentRunnerModal').then(m => ({ default: m.AssessmentRunnerModal })));
+const AssessmentReportModal = lazy(() => import('./components/AssessmentReportModal').then(m => ({ default: m.AssessmentReportModal })));
+const CertificateModal = lazy(() => import('./components/CertificateModal').then(m => ({ default: m.CertificateModal })));
+const SettingsFrameworksModal = lazy(() => import('./components/SettingsFrameworksModal').then(m => ({ default: m.SettingsFrameworksModal })));
+const SihJuryOverviewModal = lazy(() => import('./components/SihJuryOverviewModal').then(m => ({ default: m.SihJuryOverviewModal })));
 
 import { 
   TabType, 
@@ -46,7 +53,7 @@ import {
   SAMPLE_GENERATED_MCQS 
 } from './data/mockData';
 
-function AppContent() {
+function AppContent({ onSelectVariant }: { onSelectVariant?: (variant: AppVariant) => void } = {}) {
   const { language } = useLanguage();
   // Navigation State
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
@@ -62,6 +69,7 @@ function AppContent() {
     avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80',
   });
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
 
   // Application Data State
   const [competencies, setCompetencies] = useState<CompetencyDomain[]>(INITIAL_COMPETENCIES);
@@ -113,6 +121,7 @@ function AppContent() {
 
   const [activeScorecard, setActiveScorecard] = useState<AssessmentResult | null>(null);
   const [activeCertificateItem, setActiveCertificateItem] = useState<LearningHistoryItem | null>(null);
+  const [isSihModalOpen, setIsSihModalOpen] = useState<boolean>(false);
 
   // Compute overall score
   const totalScore = Math.round(
@@ -171,13 +180,49 @@ function AppContent() {
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
 
+  const generateOfficerCompetencies = (
+    baseCompetencies: CompetencyDomain[],
+    targetReadiness: number
+  ): CompetencyDomain[] => {
+    const baseAverage = Math.round(
+      baseCompetencies.reduce((acc, c) => acc + c.scorePercentage, 0) / (baseCompetencies.length || 1)
+    );
+    const factor = targetReadiness / (baseAverage || 70);
+
+    return baseCompetencies.map((c) => {
+      const scaledScore = Math.min(98, Math.max(30, Math.round(c.scorePercentage * factor)));
+      const scaledLevel = Math.min(5, Math.max(1, Number((scaledScore / 20).toFixed(1))));
+      const status =
+        scaledScore >= 75
+          ? 'Proficient'
+          : scaledScore >= 55
+          ? 'Developing'
+          : 'Critical Gap';
+
+      return {
+        ...c,
+        currentLevel: scaledLevel,
+        scorePercentage: scaledScore,
+        status: status as any,
+      };
+    });
+  };
+
+  const handleOfficerLogin = (profile: OfficerProfile) => {
+    setCurrentUser(profile);
+    if (profile.karmaPoints) {
+      setKarmaPoints(profile.karmaPoints);
+    }
+    if (profile.readinessScore) {
+      setCompetencies(generateOfficerCompetencies(INITIAL_COMPETENCIES, profile.readinessScore));
+    }
+    setIsLoggedIn(true);
+  };
+
   if (!isLoggedIn) {
     return (
       <LandingLoginPage
-        onLoginSuccess={(profile) => {
-          setCurrentUser(profile);
-          setIsLoggedIn(true);
-        }}
+        onLoginSuccess={handleOfficerLogin}
       />
     );
   }
@@ -193,7 +238,7 @@ function AppContent() {
         setIsMobileOpen={setIsMobileNavOpen}
         language={language}
         user={currentUser}
-        onOpenLogin={() => setIsLoggedIn(false)}
+        onOpenSettings={() => setIsSettingsModalOpen(true)}
       />
 
       {/* 2. Top Navigation Bar */}
@@ -205,112 +250,135 @@ function AppContent() {
         karmaPoints={karmaPoints}
         user={currentUser}
         onOpenLogin={() => setIsLoggedIn(false)}
+        onOpenSihJuryModal={() => setIsSihModalOpen(true)}
       />
 
       {/* 3. Main Content Container */}
       <main className="flex-1 md:ml-[280px] pt-20 pb-16 px-4 sm:px-8 max-w-full overflow-x-hidden">
-        {activeTab === 'dashboard' && (
-          <DashboardView
-            competencies={competencies}
-            setActiveTab={setActiveTab}
-            onStartAssessmentForDomain={handleLaunchTargetedQuiz}
-            user={currentUser}
-            onOpenLogin={() => setIsLoggedIn(false)}
-            language={language}
-          />
-        )}
+        <ErrorBoundary fallbackTitle="Portal View Rendering Exception">
+          {activeTab === 'dashboard' && (
+            <DashboardView
+              competencies={competencies}
+              setActiveTab={setActiveTab}
+              onStartAssessmentForDomain={handleLaunchTargetedQuiz}
+              user={currentUser}
+              onOpenLogin={() => setIsLoggedIn(false)}
+              language={language}
+            />
+          )}
 
-        {activeTab === 'competency' && (
-          <CompetencyAnalyzerView
-            competencies={competencies}
-            setActiveTab={setActiveTab}
-            onLaunchTargetedQuiz={handleLaunchTargetedQuiz}
-          />
-        )}
+          {activeTab === 'competency' && (
+            <CompetencyAnalyzerView
+              competencies={competencies}
+              setActiveTab={setActiveTab}
+              onLaunchTargetedQuiz={handleLaunchTargetedQuiz}
+            />
+          )}
 
-        {activeTab === 'viva' && (
-          <VivaExaminerView
-            language={language}
-            onAwardKarmaPoints={(pts) => setKarmaPoints((prev) => prev + pts)}
-          />
-        )}
+          {activeTab === 'viva' && (
+            <VivaExaminerView
+              language={language}
+              onAwardKarmaPoints={(pts) => setKarmaPoints((prev) => prev + pts)}
+            />
+          )}
 
-        {activeTab === 'igot' && (
-          <IGOTLearningPathView
-            courses={courses}
-            history={learningHistory}
-            onOpenCertificate={(item) => setActiveCertificateItem(item)}
-            onLaunchCourseQuiz={handleLaunchCourseQuiz}
-            setActiveTab={setActiveTab}
-          />
-        )}
+          {activeTab === 'igot' && (
+            <IGOTLearningPathView
+              courses={courses}
+              history={learningHistory}
+              onOpenCertificate={(item) => setActiveCertificateItem(item)}
+              onLaunchCourseQuiz={handleLaunchCourseQuiz}
+              setActiveTab={setActiveTab}
+            />
+          )}
 
-        {activeTab === 'generator' && (
-          <QuizGeneratorView
-            manuals={OFFICIAL_MANUALS}
-            onStartExam={handleStartExam}
-            language={language}
-          />
-        )}
+          {activeTab === 'generator' && (
+            <QuizGeneratorView
+              manuals={OFFICIAL_MANUALS}
+              onStartExam={handleStartExam}
+              language={language}
+            />
+          )}
 
-        {activeTab === 'analytics' && (
-          <AnalyticsReportsView
-            competencies={competencies}
-            assessmentHistory={assessmentHistory}
-            onOpenReport={(res) => setActiveScorecard(res)}
-          />
-        )}
+          {activeTab === 'analytics' && (
+            <AnalyticsReportsView
+              competencies={competencies}
+              assessmentHistory={assessmentHistory}
+              onOpenReport={(res) => setActiveScorecard(res)}
+              user={currentUser}
+            />
+          )}
+        </ErrorBoundary>
       </main>
 
-      {/* 4. Active Assessment Runner Modal */}
-      {activeExamData && (
-        <AssessmentRunnerModal
-          questions={activeExamData.questions}
-          title={activeExamData.title}
-          targetRole={activeExamData.targetRole}
-          difficulty={activeExamData.difficulty}
-          onComplete={handleExamComplete}
-          onCancel={() => setActiveExamData(null)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {/* 4. Active Assessment Runner Modal */}
+        {activeExamData && (
+          <AssessmentRunnerModal
+            questions={activeExamData.questions}
+            title={activeExamData.title}
+            targetRole={activeExamData.targetRole}
+            difficulty={activeExamData.difficulty}
+            onComplete={handleExamComplete}
+            onCancel={() => setActiveExamData(null)}
+          />
+        )}
 
-      {/* 5. Post-Exam Diagnostic Scorecard Modal */}
-      {activeScorecard && (
-        <AssessmentReportModal
-          result={activeScorecard}
-          onClose={() => setActiveScorecard(null)}
-          onRetake={() => {
-            const sc = activeScorecard;
-            setActiveScorecard(null);
-            handleStartExam(sc.questions, sc.title, sc.targetRole, sc.difficulty);
-          }}
-          onGoToLearningPath={() => {
-            setActiveScorecard(null);
-            setActiveTab('igot');
-          }}
-        />
-      )}
+        {/* 5. Post-Exam Diagnostic Scorecard Modal */}
+        {activeScorecard && (
+          <AssessmentReportModal
+            result={activeScorecard}
+            onClose={() => setActiveScorecard(null)}
+            onRetake={() => {
+              const sc = activeScorecard;
+              setActiveScorecard(null);
+              handleStartExam(sc.questions, sc.title, sc.targetRole, sc.difficulty);
+            }}
+            onGoToLearningPath={() => {
+              setActiveScorecard(null);
+              setActiveTab('igot');
+            }}
+          />
+        )}
 
-      {/* 6. Official Certificate Modal */}
-      {activeCertificateItem && (
-        <CertificateModal
-          item={activeCertificateItem}
-          officerName={`${currentUser.name} (${currentUser.role})`}
-          onClose={() => setActiveCertificateItem(null)}
-        />
-      )}
+        {/* 6. Official Certificate Modal */}
+        {activeCertificateItem && (
+          <CertificateModal
+            item={activeCertificateItem}
+            officerName={`${currentUser.name} (${currentUser.role})`}
+            onClose={() => setActiveCertificateItem(null)}
+          />
+        )}
 
-      {/* 7. MoSPI Officer SSO Login Modal */}
-      {isLoginModalOpen && (
-        <LoginModal
-          currentUser={currentUser}
-          onSaveProfile={(profile) => setCurrentUser(profile)}
-          onClose={() => setIsLoginModalOpen(false)}
-        />
-      )}
+        {/* 7. MoSPI Officer SSO Login Modal */}
+        {isLoginModalOpen && (
+          <LoginModal
+            currentUser={currentUser}
+            onSaveProfile={(profile) => setCurrentUser(profile)}
+            onClose={() => setIsLoginModalOpen(false)}
+          />
+        )}
 
-      {/* 8. Multilingual Language Confirmation Modal */}
-      <LanguageConfirmModal />
+        {/* 8. Settings & Frameworks Configuration Modal */}
+        {isSettingsModalOpen && (
+          <SettingsFrameworksModal
+            isOpen={isSettingsModalOpen}
+            onClose={() => setIsSettingsModalOpen(false)}
+          />
+        )}
+
+        {/* 9. Multilingual Language Confirmation Modal */}
+        <LanguageConfirmModal />
+
+        {/* 10. SIH 2026 Jury Presentation & Live Evaluation Modal */}
+        {isSihModalOpen && (
+          <SihJuryOverviewModal
+            isOpen={isSihModalOpen}
+            onClose={() => setIsSihModalOpen(false)}
+            onSelectVariant={onSelectVariant}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
@@ -319,11 +387,11 @@ export default function App() {
   const [variant, setVariant] = useState<AppVariant>(() => {
     const params = new URLSearchParams(window.location.search);
     const vParam = params.get('variant');
-    if (vParam === 'admin' || vParam === 'gamified' || vParam === 'rag' || vParam === 'primary') {
+    if (vParam === 'admin' || vParam === 'gamified' || vParam === 'rag' || vParam === 'sih' || vParam === 'primary') {
       return vParam as AppVariant;
     }
     const saved = localStorage.getItem('statkarmayogi_variant');
-    if (saved === 'admin' || saved === 'gamified' || saved === 'rag' || saved === 'primary') {
+    if (saved === 'admin' || saved === 'gamified' || saved === 'rag' || saved === 'sih' || saved === 'primary') {
       return saved as AppVariant;
     }
     return 'primary';
@@ -337,18 +405,25 @@ export default function App() {
   return (
     <>
       <OfflineBanner />
-      {variant === 'admin' && <AppVariantA />}
-      {variant === 'gamified' && <AppVariantB />}
-      {variant === 'rag' && <AppVariantC />}
-      {variant === 'primary' && (
-        <LanguageProvider>
-          <ToastProvider>
-            <AppContent />
-          </ToastProvider>
-        </LanguageProvider>
-      )}
+      <Suspense fallback={<div className="min-h-screen bg-[#0f172a] text-white flex items-center justify-center p-6 text-sm font-mono font-bold">Loading StatKarmayogi Engine...</div>}>
+        {variant === 'admin' && <AppVariantA />}
+        {variant === 'gamified' && <AppVariantB />}
+        {variant === 'rag' && <AppVariantC />}
+        {variant === 'sih' && <AppVariantD />}
+        {variant === 'primary' && (
+          <LanguageProvider>
+            <ToastProvider>
+              <AppContent onSelectVariant={handleSelectVariant} />
+            </ToastProvider>
+          </LanguageProvider>
+        )}
+      </Suspense>
 
-      <DevVariantSwitcher currentVariant={variant} onSelectVariant={handleSelectVariant} />
+      {/* Floating Developer Variant Switcher Pill */}
+      <DevVariantSwitcher
+        currentVariant={variant}
+        onSelectVariant={handleSelectVariant}
+      />
     </>
   );
 }

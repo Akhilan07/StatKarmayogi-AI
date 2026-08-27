@@ -36,6 +36,8 @@ interface TopNavBarProps {
   karmaPoints?: number;
   user?: OfficerProfile;
   onOpenLogin?: () => void;
+  onOpenSihJuryModal?: () => void;
+  showSihHeaderButton?: boolean;
 }
 
 interface SearchItem {
@@ -122,6 +124,8 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
     avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80',
   },
   onOpenLogin,
+  onOpenSihJuryModal,
+  showSihHeaderButton = false,
 }) => {
   const { language, selectLanguage } = useLanguage();
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
@@ -296,9 +300,9 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-800 transition-all shadow-xs"
             title="Switch Language / भाषा बदलें / மொழி மாற்றம்"
           >
-            <Globe className="w-3.5 h-3.5 text-[#006c4a]" />
+            <Globe className="w-3.5 h-3.5 text-[#0f2942]" />
             <span>{currentOption.label}</span>
-            <span className="bg-[#006c4a] text-white text-[10px] font-mono px-1.5 py-0.2 rounded font-bold">
+            <span className="bg-[#0f2942] text-white text-[10px] font-mono px-1.5 py-0.2 rounded font-bold">
               {currentOption.badge}
             </span>
           </button>
@@ -317,7 +321,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
                   }}
                   className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
                     language === opt.code
-                      ? 'bg-emerald-50 text-[#006c4a] border border-emerald-200'
+                      ? 'bg-slate-100 text-[#0f2942] border border-slate-200'
                       : 'hover:bg-slate-50 text-slate-700'
                   }`}
                 >
@@ -333,14 +337,26 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
           )}
         </div>
 
+        {/* SIH 2026 Jury Presentation Mode Button */}
+        {showSihHeaderButton && onOpenSihJuryModal && (
+          <button
+            onClick={onOpenSihJuryModal}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-600/30 border border-amber-500/40 text-amber-900 text-xs font-extrabold hover:bg-amber-100 transition-all shadow-xs active:scale-95"
+            title="SIH 2026 Grand Finale Jury Presentation Deck & Live Metrics"
+          >
+            <Award className="w-3.5 h-3.5 text-amber-600" />
+            <span>SIH 2026 Jury Deck</span>
+          </button>
+        )}
+
         {/* KarmaPoints Badge */}
         <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-extrabold" title="iGOT KarmaPoints">
           <Sparkles className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
           <span>{karmaPoints} KarmaPts</span>
         </div>
 
-        <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/70 text-[#006c4a] text-xs font-semibold">
-          <ShieldCheck className="w-3.5 h-3.5" />
+        <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[#0f2942] text-xs font-semibold">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#0f2942]" />
           <span>Mission Karmayogi</span>
         </div>
 
@@ -349,7 +365,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
           <button
             id="topbar-notifications-btn"
             onClick={() => setShowNotifications(!showNotifications)}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-[#006c4a] hover:bg-emerald-50 transition-colors relative"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-[#0f2942] hover:bg-slate-100 transition-colors relative"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
@@ -360,7 +376,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
             <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 p-3 z-50 animate-in fade-in slide-in-from-top-2">
               <div className="flex justify-between items-center pb-2 mb-2 border-b border-slate-100">
                 <span className="font-bold text-xs text-slate-900">Official Notifications</span>
-                <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold">2 New</span>
+                <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-semibold">2 New</span>
               </div>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {notifications.map((n) => (
@@ -370,7 +386,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
                       setActiveTab(n.action);
                       setShowNotifications(false);
                     }}
-                    className={`p-2 rounded-lg cursor-pointer transition-colors text-left ${n.unread ? 'bg-emerald-50/60 hover:bg-emerald-50' : 'hover:bg-slate-50'}`}
+                    className={`p-2 rounded-lg cursor-pointer transition-colors text-left ${n.unread ? 'bg-slate-50 hover:bg-slate-100' : 'hover:bg-slate-50'}`}
                   >
                     <div className="flex justify-between items-center">
                       <p className="text-xs font-bold text-slate-900">{n.title}</p>
@@ -388,7 +404,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
         <button
           id="topbar-help-btn"
           onClick={() => setShowHelpModal(true)}
-          className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-[#006c4a] hover:bg-emerald-50 transition-colors"
+          className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-[#0f2942] hover:bg-slate-100 transition-colors"
           title="MoSPI Competency Framework Guide"
         >
           <HelpCircle className="w-4 h-4" />
@@ -403,11 +419,11 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
           title="Click to Switch Officer Profile"
         >
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-bold text-slate-900 leading-tight group-hover:text-[#006c4a] transition-colors">{user.name}</p>
+            <p className="text-xs font-bold text-slate-900 leading-tight group-hover:text-[#0f2942] transition-colors">{user.name}</p>
             <p className="text-[10px] text-slate-500 font-medium truncate max-w-[140px]">{user.role}</p>
           </div>
           <div className="relative">
-            <div className="w-9 h-9 rounded-full bg-[#006c4a] text-white flex items-center justify-center font-bold text-xs tracking-wider uppercase ring-2 ring-emerald-600/30 group-hover:ring-emerald-600 transition-all shadow-xs">
+            <div className="w-9 h-9 rounded-full bg-[#0f2942] text-white flex items-center justify-center font-bold text-xs tracking-wider uppercase ring-2 ring-slate-300 group-hover:ring-[#0f2942] transition-all shadow-xs">
               {user.name.split(' ').map(n => n[0]).join('').slice(0, 2) || 'MO'}
             </div>
             <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
