@@ -11,6 +11,14 @@ export interface TranslationDictionary {
   nav_karmayogi: string;
   nav_switch_login: string;
   nav_sign_out: string;
+  sidebar_core_workspace: string;
+  sidebar_evaluation_viva: string;
+  sidebar_growth_telemetry: string;
+  sidebar_badge_new: string;
+  sidebar_launch_diagnostic: string;
+  sidebar_mission_karmayogi: string;
+  sidebar_framework_aligned: string;
+  sidebar_settings_frameworks: string;
 
   // Language selector
   lang_switch_title: string;
@@ -234,6 +242,14 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     export_telemetry: "Export Telemetry CSV",
     division_metrics: "Division-wide Readiness",
     workforce_readiness: "Workforce Competency Distribution",
+    sidebar_core_workspace: "Core Workspace",
+    sidebar_evaluation_viva: "Evaluation & Viva",
+    sidebar_growth_telemetry: "Growth & Telemetry",
+    sidebar_badge_new: "New",
+    sidebar_launch_diagnostic: "Launch Quick Diagnostic",
+    sidebar_mission_karmayogi: "Mission Karmayogi",
+    sidebar_framework_aligned: "Competency Framework Aligned",
+    sidebar_settings_frameworks: "Settings & Frameworks",
   },
 
   hi: {
@@ -352,6 +368,14 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     export_telemetry: "टेलीमेट्री CSV निर्यात करें",
     division_metrics: "प्रभाग-वार तत्परता",
     workforce_readiness: "कार्यबल दक्षता वितरण",
+    sidebar_core_workspace: "मुख्य कार्यक्षेत्र",
+    sidebar_evaluation_viva: "AI मूल्यांकन",
+    sidebar_growth_telemetry: "अधिगम एवं रिपोर्ट",
+    sidebar_badge_new: "नया",
+    sidebar_launch_diagnostic: "त्वरित निदान आरंभ करें",
+    sidebar_mission_karmayogi: "मिशन कर्मयोगी",
+    sidebar_framework_aligned: "दक्षता ढांचा संरेखित",
+    sidebar_settings_frameworks: "सेटिंग्स एवं ढांचा",
   },
 
   ta: {
@@ -470,6 +494,14 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     export_telemetry: "செயல்பாட்டு தரவு CSV ஏற்றுமதி",
     division_metrics: "பிரிவு வாரியான தயார்நிலை",
     workforce_readiness: "பணியாளர் திறன் விநியோகம்",
+    sidebar_core_workspace: "முக்கிய பணிப்பகுதி",
+    sidebar_evaluation_viva: "AI மதிப்பீடு",
+    sidebar_growth_telemetry: "கற்றல் & அளவீடு",
+    sidebar_badge_new: "புதியது",
+    sidebar_launch_diagnostic: "விரைவு நோயறிதலைத் தொடங்கு",
+    sidebar_mission_karmayogi: "மிஷன் கர்மயோகி",
+    sidebar_framework_aligned: "திறன் கட்டமைப்பு சீரமைக்கப்பட்டது",
+    sidebar_settings_frameworks: "அமைப்புகள் & கட்டமைப்புகள்",
   },
   te: {} as any,
   ml: {} as any,
@@ -500,7 +532,15 @@ TRANSLATIONS.te = {
   nav_viva: "AI మౌఖిక వివా",
   status_proficient: "నైపుణ్యం గల",
   status_critical_gap: "తీవ్రమైన లోటు",
-  status_moderate_gap: "మితమైన అంతరం"
+  status_moderate_gap: "మితమైన అంతరం",
+  sidebar_core_workspace: "కోర్ వర్క్‌స్పేస్",
+  sidebar_evaluation_viva: "మూల్యాంకనం & వివా",
+  sidebar_growth_telemetry: "వృద్ధి & టెలిమెట్రీ",
+  sidebar_badge_new: "కొత్తది",
+  sidebar_launch_diagnostic: "త్వరిత నిర్ధారణను ప్రారంభించండి",
+  sidebar_mission_karmayogi: "మిషన్ కర్మయోగి",
+  sidebar_framework_aligned: "సామర్థ్య ఫ్రేమ్‌వర్క్ సమలేఖనం చేయబడింది",
+  sidebar_settings_frameworks: "సెట్టింగులు & ఫ్రేమ్‌వర్క్‌లు"
 };
 
 TRANSLATIONS.ml = {
@@ -520,13 +560,21 @@ TRANSLATIONS.ml = {
   landing_sign_in_btn: "സ്ഥിരീകരിച്ച് വർക്ക്സ്പേസിൽ പ്രവേശിക്കുക",
   nav_dashboard: "ഡാഷ്‌ബോർഡ്",
   nav_competency: "ശേഷി വിശകലനം",
-  nav_igot: "iGOT ലೇണിംഗ് പാത്ത്",
+  nav_igot: "iGOT ലേണിംഗ് പാത്ത്",
   nav_generator: "ക്വിസ് & MCQ ജനറേറ്റർ",
   nav_analytics: "അനലിറ്റിക്സും റിപ്പോർട്ടുകളും",
-  nav_viva: "AI വോയ്‌း വിവാ",
-  status_proficient: "ಪ್ರವೀಣ್",
+  nav_viva: "AI വോയ്‌സ് വിവാ",
+  status_proficient: "പ്രവീണ്",
   status_critical_gap: "ഗുരുതരമായ കുറവ്",
-  status_moderate_gap: "മിതമായ വ്യത്യാസം"
+  status_moderate_gap: "മിതമായ വ്യത്യാസം",
+  sidebar_core_workspace: "കോർ വർക്ക്സ്പേസ്",
+  sidebar_evaluation_viva: "മൂല്യനിർണ്ണയം & വിവ",
+  sidebar_growth_telemetry: "വളർച്ചയും ടെലിമെട്രിയും",
+  sidebar_badge_new: "പുതിയത്",
+  sidebar_launch_diagnostic: "ദ്രുത രോഗനിർണയം ആരംഭിക്കുക",
+  sidebar_mission_karmayogi: "മിഷൻ കർമ്മയോഗി",
+  sidebar_framework_aligned: "ശേഷി ചട്ടക്കൂട് വിന്യസിച്ചു",
+  sidebar_settings_frameworks: "ക്രമീകരണങ്ങളും ചട്ടക്കൂടുകളും"
 };
 
 TRANSLATIONS.kn = {
@@ -552,5 +600,13 @@ TRANSLATIONS.kn = {
   nav_viva: "AI ಮೌಖಿಕ ಪರೀಕ್ಷೆ",
   status_proficient: "ಪರಿಣಿತ",
   status_critical_gap: "ಗಂಭೀರ ಕೊರತೆ",
-  status_moderate_gap: "ಮಧ್ಯಮ ಅಂತರ"
+  status_moderate_gap: "ಮಧ್ಯಮ ಅಂತರ",
+  sidebar_core_workspace: "ಕೋರ್ ವರ್ಕ್‌ಸ್ಪೇಸ್",
+  sidebar_evaluation_viva: "ಮೌಲ್ಯಮಾಪನ ಮತ್ತು ವಿವಾ",
+  sidebar_growth_telemetry: "ಬೆಳವಣಿಗೆ ಮತ್ತು ಟೆಲಿಮೆಟ್ರಿ",
+  sidebar_badge_new: "ಹೊಸತು",
+  sidebar_launch_diagnostic: "ತ್ವರಿತ ರೋಗನಿರ್ಣಯವನ್ನು ಪ್ರಾರಂಭಿಸಿ",
+  sidebar_mission_karmayogi: "ಮಿಷನ್ ಕರ್ಮಯೋಗಿ",
+  sidebar_framework_aligned: "ಸಾಮರ್ಥ್ಯ ಚೌಕಟ್ಟು ಜೋಡಿಸಲಾಗಿದೆ",
+  sidebar_settings_frameworks: "ಸಂಯೋಜನೆಗಳು ಮತ್ತು ಚೌಕಟ್ಟುಗಳು"
 };

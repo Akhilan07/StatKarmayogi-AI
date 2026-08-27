@@ -33,27 +33,25 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
   setIsMobileOpen,
   onOpenSettings,
 }) => {
-  const { t, language } = useLanguage();
-  const isHindi = language === 'hi';
-  const isTamil = language === 'ta';
+  const { t } = useLanguage();
 
   const navSections = [
     {
-      title: isTamil ? 'முக்கிய பணிப்பகுதி' : isHindi ? 'मुख्य कार्यक्षेत्र' : 'CORE WORKSPACE',
+      title: t('sidebar_core_workspace'),
       items: [
         { id: 'dashboard' as TabType, label: t('nav_dashboard'), icon: LayoutDashboard },
         { id: 'competency' as TabType, label: t('nav_competency'), icon: BarChart3 },
       ],
     },
     {
-      title: isTamil ? 'AI மதிப்பீடு' : isHindi ? 'AI मूल्यांकन' : 'EVALUATION & VIVA',
+      title: t('sidebar_evaluation_viva'),
       items: [
-        { id: 'viva' as TabType, label: t('nav_viva'), icon: Mic, badge: isTamil ? 'புதியது' : isHindi ? 'नया' : 'New' },
+        { id: 'viva' as TabType, label: t('nav_viva'), icon: Mic, badge: t('sidebar_badge_new') },
         { id: 'generator' as TabType, label: t('nav_generator'), icon: FileQuestion },
       ],
     },
     {
-      title: isTamil ? 'கற்றல் & அளவீடு' : isHindi ? 'अधिगम एवं रिपोर्ट' : 'GROWTH & TELEMETRY',
+      title: t('sidebar_growth_telemetry'),
       items: [
         { id: 'igot' as TabType, label: t('nav_igot'), icon: GraduationCap },
         { id: 'analytics' as TabType, label: t('nav_analytics'), icon: LineChart },
@@ -91,7 +89,7 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
             className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white rounded-xl font-bold text-xs transition-all duration-200 shadow-md hover:shadow-emerald-900/40 flex items-center justify-center gap-2 group border border-emerald-500/30"
           >
             <Play className="w-3.5 h-3.5 fill-current text-white group-hover:scale-110 transition-transform" />
-            <span>{isTamil ? 'விரைவு நோயறிதலைத் தொடங்கு' : isHindi ? 'त्वरित निदान आरंभ करें' : 'Launch Quick Diagnostic'}</span>
+            <span>{t('sidebar_launch_diagnostic')}</span>
           </button>
         </div>
 
@@ -143,10 +141,10 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
             <Award className="w-5 h-5 text-emerald-400 shrink-0" />
             <div className="min-w-0">
               <p className="text-[11px] font-bold text-slate-200 uppercase tracking-wide">
-                {isTamil ? 'மிஷன் கர்மயோகி' : isHindi ? 'मिशन कर्मयोगी' : 'Mission Karmayogi'}
+                {t('sidebar_mission_karmayogi')}
               </p>
               <p className="text-[10px] text-emerald-400/90 truncate font-medium">
-                {isTamil ? 'திறன் கட்டமைப்பு சீரமைக்கப்பட்டது' : isHindi ? 'दक्षता ढांचा संरेखित' : 'Competency Framework Aligned'}
+                {t('sidebar_framework_aligned')}
               </p>
             </div>
           </div>
@@ -158,7 +156,7 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({
               className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/80 border border-slate-800/60 transition-all"
             >
               <Settings className="w-4 h-4 text-emerald-400" />
-              <span>{isTamil ? 'அமைப்புகள் & கட்டமைப்புகள்' : isHindi ? 'सेटिंग्स एवं ढांचा' : 'Settings & Frameworks'}</span>
+              <span>{t('sidebar_settings_frameworks')}</span>
             </button>
           </div>
         </div>
