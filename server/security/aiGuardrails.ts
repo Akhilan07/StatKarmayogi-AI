@@ -13,6 +13,9 @@ const JAILBREAK_PATTERNS = [
   /override\s+(your\s+)?(system\s+)?(instructions|prompt|rules)/gi,
   /do\s+anything\s+now|DAN\s+mode|jailbreak/gi,
   /reveal\s+(your\s+)?(system\s+prompt|api\s+key|instructions)/gi,
+  /print\s+(the\s+)?(hidden|system)\s+prompt/gi,
+  /forget\s+(all\s+)?(retrieved\s+)?context/gi,
+  /act\s+as\s+(another|a\s+different)\s+(model|AI|bot)/gi,
   /\[INST\]|\{\{\s*system\s*\}\}|\<\<SYS\>\>|SYSTEM_PROMPT\:/gi,
   /act\ as\ an?\ unrestricted\ AI/gi,
 ];

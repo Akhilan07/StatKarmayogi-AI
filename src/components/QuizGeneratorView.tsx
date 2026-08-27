@@ -23,6 +23,7 @@ import {
   X,
   FileJson
 } from 'lucide-react';
+import { AiTransparencyModal, AiTransparencyData } from './AiTransparencyModal';
 import { 
   OfficialManual, 
   Question, 
@@ -68,9 +69,8 @@ export const QuizGeneratorView: React.FC<QuizGeneratorViewProps> = ({
   const [selectedPreviewOption, setSelectedPreviewOption] = useState<'A' | 'B' | 'C' | 'D' | null>(null);
   const [showExplanation, setShowExplanation] = useState<boolean>(true);
   const [copiedNotification, setCopiedNotification] = useState<boolean>(false);
-  const [showSchemaModal, setShowSchemaModal] = useState<boolean>(false);
-  const [schemaModalTab, setSchemaModalTab] = useState<'schema' | 'system_prompt' | 'raw_json'>('schema');
-  const [copiedSchema, setCopiedSchema] = useState<boolean>(false);
+  const [showTransparencyModal, setShowTransparencyModal] = useState<boolean>(false);
+  const [transparencyData, setTransparencyData] = useState<AiTransparencyData | undefined>(undefined);
 
   // Selected manual object
   const currentManual = manuals.find((m) => m.id === selectedManualId) || manuals[0];
@@ -144,10 +144,14 @@ Return STRICT VALID JSON matching the provided schema.`;
         language: (language as AppLanguage),
       });
 
-      if (data.questions && data.questions.length > 0) {
+      if (data && data.questions && data.questions.length > 0) {
         setGeneratedQuestions(data.questions);
         setRawQuizOutput(data);
+        if (data.aiTransparency) {
+          setTransparencyData(data.aiTransparency);
+        }
         setPreviewIndex(0);
+        setSelectedPreviewOption(null);
       } else {
         const fallbackList = buildFallbackQuestions(currentManual, difficulty, targetRole, language);
         setGeneratedQuestions(fallbackList);
@@ -265,11 +269,7 @@ Return STRICT VALID JSON matching the provided schema.`;
     setTimeout(() => setCopiedNotification(false), 2500);
   };
 
-  const handleCopySchemaContent = (content: string) => {
-    navigator.clipboard.writeText(content);
-    setCopiedSchema(true);
-    setTimeout(() => setCopiedSchema(false), 2500);
-  };
+
 
   const currentQuestion = generatedQuestions[previewIndex] || generatedQuestions[0];
 
@@ -309,11 +309,11 @@ Return STRICT VALID JSON matching the provided schema.`;
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowSchemaModal(true)}
-              className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5 border border-slate-700"
+              onClick={() => setShowTransparencyModal(true)}
+              className="px-3.5 py-2 bg-[#0f172a] hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5 border border-slate-700"
             >
-              <Code2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>AI Studio Schema &amp; Prompt</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>🛡️ {isTamil ? 'AI வெளிப்படைத்தன்மை' : isHindi ? 'एआई पारदर्शिता' : 'AI Transparency'}</span>
             </button>
 
             <button
@@ -678,58 +678,12 @@ Return STRICT VALID JSON matching the provided schema.`;
         </section>
       </div>
 
-      {/* AI Studio Schema Modal */}
-      {showSchemaModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex justify-between items-start">
-              <div className="flex items-center gap-2">
-                <Code2 className="w-5 h-5 text-[#006c4a]" />
-                <h3 className="text-base font-bold text-slate-900">Gemini 3.7 Structured JSON Schema</h3>
-              </div>
-              <button onClick={() => setShowSchemaModal(false)} className="p-1 text-slate-400 hover:text-slate-700">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="flex bg-slate-100 p-1 rounded-xl text-xs font-bold">
-              <button
-                onClick={() => setSchemaModalTab('schema')}
-                className={`flex-1 py-1.5 rounded-lg ${schemaModalTab === 'schema' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'}`}
-              >
-                Output Schema JSON
-              </button>
-              <button
-                onClick={() => setSchemaModalTab('system_prompt')}
-                className={`flex-1 py-1.5 rounded-lg ${schemaModalTab === 'system_prompt' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'}`}
-              >
-                System Instruction Prompt
-              </button>
-            </div>
-
-            <pre className="p-4 bg-slate-900 text-emerald-400 text-xs font-mono rounded-xl overflow-x-auto max-h-72 custom-scrollbar">
-              {schemaModalTab === 'schema'
-                ? JSON.stringify(JSON_OUTPUT_SCHEMA, null, 2)
-                : SYSTEM_INSTRUCTION_PROMPT}
-            </pre>
-
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                onClick={() => handleCopySchemaContent(schemaModalTab === 'schema' ? JSON.stringify(JSON_OUTPUT_SCHEMA, null, 2) : SYSTEM_INSTRUCTION_PROMPT)}
-                className="px-4 py-2 bg-emerald-100 text-[#006c4a] rounded-xl text-xs font-bold hover:bg-emerald-200"
-              >
-                {copiedSchema ? 'Copied to Clipboard!' : 'Copy Schema Prompt'}
-              </button>
-              <button
-                onClick={() => setShowSchemaModal(false)}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* AI Transparency & Grounding Report Modal */}
+      <AiTransparencyModal
+        isOpen={showTransparencyModal}
+        onClose={() => setShowTransparencyModal(false)}
+        data={transparencyData}
+      />
     </div>
   );
 };

@@ -24,6 +24,7 @@ export interface QuizGenerationResponse {
   source_manual?: string;
   competency_focus?: string;
   questions?: Question[];
+  aiTransparency?: any;
   error?: string;
 }
 

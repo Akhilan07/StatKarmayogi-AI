@@ -21,6 +21,7 @@ import {
 import { CompetencyDomain, TabType, CompetencyGapAnalysisResult } from '../types';
 import { MoSPIAssessmentApiService } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { AiTransparencyModal } from './AiTransparencyModal';
 
 interface CompetencyAnalyzerViewProps {
   competencies: CompetencyDomain[];
@@ -59,8 +60,9 @@ export const CompetencyAnalyzerView: React.FC<CompetencyAnalyzerViewProps> = ({
   onLaunchTargetedQuiz,
 }) => {
   const { t } = useLanguage();
-  const [selectedRole, setSelectedRole] = useState<string>('Senior Statistical Officer');
-  const [selectedPillar, setSelectedPillar] = useState<string>('All Pillars');
+  const [selectedRole, setSelectedRole] = useState<string>('Senior Statistical Officer (SSO)');
+  const [selectedDomainFilter, setSelectedDomainFilter] = useState<'All' | CompetencyDomain>('All');
+  const [showTransparencyModal, setShowTransparencyModal] = useState<boolean>(false);
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
   const [aiGapResult, setAiGapResult] = useState<CompetencyGapAnalysisResult | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
@@ -190,11 +192,11 @@ Output strictly valid JSON matching the following structure:
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowSystemPromptModal(true)}
-            className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5 border border-slate-700"
+            onClick={() => setShowTransparencyModal(true)}
+            className="px-3.5 py-2 bg-[#0f172a] hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5 border border-slate-700"
           >
-            <Code2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>AI Studio Gap Prompt</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>AI Transparency</span>
           </button>
 
           <button
@@ -240,9 +242,9 @@ Output strictly valid JSON matching the following structure:
               {pillars.map((p) => (
                 <button
                   key={p}
-                  onClick={() => setSelectedPillar(p)}
+                  onClick={() => setSelectedDomainFilter(p as any)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    selectedPillar === p
+                    'All' === p
                       ? 'bg-[#0f2942] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
@@ -255,7 +257,7 @@ Output strictly valid JSON matching the following structure:
             {/* Range Bar Items */}
             <div className="space-y-6">
               {(aiGapResult?.competency_scores || competencies
-                .filter(c => selectedPillar === 'All Pillars' || c.pillar === selectedPillar)
+                .filter(c => true)
                 .map(c => ({
                   competency: c.name,
                   pillar: c.pillar,
@@ -478,64 +480,14 @@ Output strictly valid JSON matching the following structure:
                 <Sparkles className="w-3.5 h-3.5 text-[#85f8c4]" />
                 <span>Generate Custom Quiz on Gaps</span>
               </button>
+              <AiTransparencyModal
+                isOpen={showTransparencyModal}
+                onClose={() => setShowTransparencyModal(false)}
+              />
             </div>
           </div>
         </section>
       </div>
-
-      {/* System Prompt Modal */}
-      {showSystemPromptModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="p-4 sm:p-5 bg-slate-900 text-white flex justify-between items-center">
-              <div className="flex items-center gap-2.5">
-                <Code2 className="w-5 h-5 text-emerald-400" />
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold">Competency Gap Evaluation Engine Prompt</h3>
-                  <p className="text-[11px] text-slate-300">Google AI Studio System Instruction & JSON Schema</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowSystemPromptModal(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-5 flex-1 overflow-y-auto bg-slate-950 text-xs font-mono text-slate-200 space-y-4">
-              <div className="p-3 bg-slate-900 rounded-lg border border-slate-800 text-emerald-400 font-sans text-xs">
-                Use this system instruction in AI Studio to calculate skill gaps and recommend mock iGOT courses based on diagnostic scores.
-              </div>
-
-              <pre className="whitespace-pre-wrap leading-relaxed text-emerald-300 font-mono">
-                {SYSTEM_INSTRUCTION_PROMPT}
-              </pre>
-            </div>
-
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-              <span className="text-[11px] text-slate-500">
-                Ready for Google AI Studio System Instructions panel.
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleCopyPrompt}
-                  className="px-4 py-2 bg-[#006c4a] hover:bg-[#005137] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
-                >
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>{copiedPrompt ? 'Copied Prompt!' : 'Copy System Prompt'}</span>
-                </button>
-                <button
-                  onClick={() => setShowSystemPromptModal(false)}
-                  className="px-3 py-2 bg-white text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-semibold rounded-xl"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

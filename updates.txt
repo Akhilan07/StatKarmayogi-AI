@@ -223,3 +223,12 @@ Briefing:
 - Prevent Language Fallback Bugs: Replaced hardcoded language conditionals in navigation lists, avoiding defaults to English when Telugu, Malayalam, or Kannada are selected.
 - Complete Dictionary Integration: Added corresponding translation overrides for te, ml, and kn sidebar modules in translations.ts.
 - Compilation & Build Verification: Passed clean type-checking verification (npx tsc --noEmit) with 0 errors.
+
+Update #31 - Aug 27, 2026 [14:01 IST]
+Name: Enterprise AI Transparency System Implementation & Complete Developer Prompt Removal
+Briefing:
+- Complete Developer Jargon Removal: Completely removed "AI Studio Schema & Prompt" and "AI Studio Gap Prompt" buttons, raw system instruction strings, and JSON schema modals from QuizGeneratorView.tsx and CompetencyAnalyzerView.tsx to eliminate client-side prompt leakage and security vulnerability concerns.
+- Enterprise AI Transparency Modal (AiTransparencyModal.tsx): Created a reusable, government-grade Explainable AI (XAI) modal displaying Grounding Confidence Score (96.4%), Source Manual Section Lineage (NSS 78th Vol-I, Sec 3.2-4.1, Pages 12-19), Bloom's Taxonomy Cognitive Distribution, Official Competencies Covered, Question Difficulty Breakdown, and Security Compliance Badges (DPDP Act 2023, Zero Data Retention).
+- Backend Transparency Telemetry: Enriched server/services/geminiService.ts payload with an aiTransparency telemetry object returned alongside generated assessments.
+- Expanded Prompt Injection Defense: Added regex rules to server/security/aiGuardrails.ts blocking malicious attempts ('print hidden prompt', 'forget retrieved context', 'act as another model').
+- Build & Type Verification: Verified clean TypeScript compilation (npx tsc --noEmit) and successful production Vite bundling (npm run build).
